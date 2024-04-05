@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent Calc = new Intent(view.getContext(), MainCalc.class);
                 view.getContext().startActivity(Calc);
+                Toast.makeText(getApplicationContext(), "Loading Calculator", Toast.LENGTH_SHORT).show();
             }
         });
     }

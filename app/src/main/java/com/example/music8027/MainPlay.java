@@ -13,9 +13,9 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.material.button.MaterialButton;
 
 public class MainPlay extends AppCompatActivity {
-    private String play_state = "paused";
-    private String shuffle_state = "no_shuffle";
-    private String thumb_state = "no_like";
+    private String play_state = "playing";
+    private String shuffle_state = "shuffle off";
+    private String thumb_state = "removed from liked songs";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +45,10 @@ public class MainPlay extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (play_state == "paused") {
-                    play.setIconResource(R.drawable.ic_play_circle_filled);
+                    play.setIconResource(R.drawable.ic_pause_circle_filled);
                     play_state = "playing";
                 } else {
-                    play.setIconResource(R.drawable.ic_pause_circle_filled);
+                    play.setIconResource(R.drawable.ic_play_circle_filled);
                     play_state = "paused";
                 }
                 Toast.makeText(getApplicationContext(), play_state, Toast.LENGTH_SHORT).show();
@@ -58,26 +58,28 @@ public class MainPlay extends AppCompatActivity {
         shuffle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (shuffle_state == "shuffle") {
+                if (shuffle_state == "shuffle on") {
                     shuffle.setIconResource(R.drawable.ic_shuffle);
-                    shuffle_state = "no_shuffle";
+                    shuffle_state = "shuffle off";
                 } else {
                     shuffle.setIconResource(R.drawable.ic_shuffle_on);
-                    shuffle_state = "shuffle";
+                    shuffle_state = "shuffle on";
                 }
+                Toast.makeText(getApplicationContext(), shuffle_state, Toast.LENGTH_SHORT).show();
             }
         });
 
         thumb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (thumb_state == "like") {
+                if (thumb_state == "added to liked songs") {
                     thumb.setIconResource(R.drawable.ic_thumb_up_off_alt);
-                    thumb_state = "no_like";
+                    thumb_state = "removed from liked songs";
                 } else {
                     thumb.setIconResource(R.drawable.ic_thumb_up);
-                    thumb_state = "like";
+                    thumb_state = "added to liked songs";
                 }
+                Toast.makeText(getApplicationContext(), thumb_state, Toast.LENGTH_SHORT).show();
             }
         });
     }
