@@ -46,7 +46,7 @@
             android:layout_column="0"
             android:layout_columnSpan="5"
             android:layout_margin="2sp"
-            tools:srcCompat="@tools:sample/backgrounds/scenic" />
+            android:src="@drawable/vinyl" />
 
 
         <com.google.android.material.button.MaterialButton
@@ -81,7 +81,7 @@
             android:layout_column="2"
             android:layout_marginStart="5sp"
             android:textColor="@color/white"
-            app:icon="@drawable/ic_play_circle_filled"
+            app:icon="@drawable/ic_pause_circle_filled"
             app:iconGravity="textStart"
             app:iconSize="65sp"
             app:iconTint="#f00" />
@@ -204,7 +204,7 @@
             app:iconTint="#f00" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/settings"
+            android:id="@+id/calculator"
             android:layout_width="wrap_content"
             android:layout_height="90sp"
             android:layout_row="1"
