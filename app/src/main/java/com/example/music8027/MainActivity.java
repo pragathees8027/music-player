@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         MaterialButton buttonPlaying = (MaterialButton) findViewById(R.id.playing);
+        MaterialButton buttonCalc = (MaterialButton) findViewById(R.id.calculator);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -32,6 +33,14 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent Playing = new Intent(view.getContext(), MainPlay.class);
                 view.getContext().startActivity(Playing);
+            }
+        });
+
+        buttonCalc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent Calc = new Intent(view.getContext(), MainCalc.class);
+                view.getContext().startActivity(Calc);
             }
         });
     }
