@@ -1,89 +1,223 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_play"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:id="@+id/main_play"
     tools:context=".MainPlay">
 
+
     <TextView
-        android:id="@+id/input"
+        android:id="@+id/home"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:padding="10sp"
-        android:text="Music Player"
+        android:layout_height="60dp"
+        android:layout_marginBottom="12dp"
         android:fontFamily="monospace"
-        android:textColor="@color/white"
-        android:background="@color/teal"
-        android:textSize="40sp" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="1sp"
-        android:gravity="center">
-
-        <include
-            layout="@layout/activity_playing"
-            android:layout_width="match_parent"
-            android:layout_height="550sp" />
-
-    </RelativeLayout>
+        android:padding="10sp"
+        android:text="Now Playing"
+        android:textAlignment="center"
+        android:textColor="@color/teal"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toTopOf="@+id/gridLayout2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <GridLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="1sp"
-        android:columnCount="4"
-        android:gravity="bottom"
-        android:rowCount="1">
+        android:id="@+id/gridLayout2"
+        android:layout_width="wrap_content"
+        android:layout_height="569dp"
+        android:layout_marginTop="52dp"
+        android:columnCount="5"
+        android:gravity="center_horizontal"
+        android:paddingStart="15sp"
+        android:rowCount="10"
+        app:layout_constraintEnd_toEndOf="@+id/gridLayout"
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintTop_toBottomOf="@id/home">
 
-        <ImageButton
-            android:id="@+id/playing"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="400sp"
+            android:layout_height="300sp"
             android:layout_row="0"
+            android:layout_rowSpan="5"
             android:layout_column="0"
-            android:layout_columnWeight="1"
-            android:backgroundTint="@color/teal"
-            android:textColor="@color/white"
-            tools:srcCompat="@mipmap/ic_launcher_music" />
+            android:layout_columnSpan="5"
+            android:layout_margin="2sp"
+            tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
-        <ImageButton
-            android:id="@+id/song"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_row="0"
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/thumbs"
+            android:layout_width="75sp"
+            android:layout_height="75sp"
+            android:layout_row="9"
+            android:layout_column="0"
+            app:icon="@drawable/ic_thumb_up_off_alt"
+            app:iconGravity="textStart"
+            app:iconSize="45sp"
+            app:iconTint="#f00" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/previous"
+            android:layout_width="75sp"
+            android:layout_height="75sp"
+            android:layout_row="9"
             android:layout_column="1"
-            android:layout_columnWeight="1"
-            android:backgroundTint="@color/teal"
+            android:layout_marginStart="5sp"
             android:textColor="@color/white"
-            tools:srcCompat="@mipmap/ic_launcher_music" />
+            app:icon="@drawable/ic_arrow_back_ios"
+            app:iconGravity="textStart"
+            app:iconSize="45sp"
+            app:iconTint="#f00" />
 
-        <ImageButton
-            android:id="@+id/search"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_row="0"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/play"
+            android:layout_width="75sp"
+            android:layout_height="75sp"
+            android:layout_row="9"
             android:layout_column="2"
-            android:layout_columnWeight="1"
-            android:backgroundTint="@color/teal"
+            android:layout_marginStart="5sp"
             android:textColor="@color/white"
-            tools:srcCompat="@mipmap/ic_launcher_music" />
+            app:icon="@drawable/ic_play_circle_filled"
+            app:iconGravity="textStart"
+            app:iconSize="65sp"
+            app:iconTint="#f00" />
 
-        <ImageButton
-            android:id="@+id/settings"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_row="0"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/next"
+            android:layout_width="75sp"
+            android:layout_height="75sp"
+            android:layout_row="9"
             android:layout_column="3"
-            android:layout_columnWeight="1"
-            android:backgroundTint="@color/teal"
+            android:layout_marginStart="5sp"
             android:textColor="@color/white"
-            tools:srcCompat="@mipmap/ic_launcher_music" />
+            app:icon="@drawable/ic_arrow_forward_ios"
+            app:iconGravity="textStart"
+            app:iconSize="45sp"
+            app:iconTint="#f00" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/shuffle"
+            android:layout_width="75sp"
+            android:layout_height="75sp"
+            android:layout_row="9"
+            android:layout_column="4"
+            android:layout_marginStart="5sp"
+            android:textColor="@color/white"
+            app:icon="@drawable/ic_shuffle"
+            app:iconGravity="textStart"
+            app:iconSize="45sp"
+            app:iconTint="#f00" />
+
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:layout_width="400sp"
+            android:layout_height="30sp"
+            android:layout_row="8"
+            android:layout_column="0"
+            android:layout_columnSpan="5"
+            android:layout_margin="2sp" />
+
+        <TextView
+            android:id="@+id/singerName"
+            android:layout_width="400sp"
+            android:layout_height="wrap_content"
+            android:layout_row="7"
+            android:layout_column="0"
+            android:layout_columnSpan="5"
+            android:fontFamily="monospace"
+            android:text="Singer"
+            android:textAlignment="center"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/songName"
+            android:layout_width="400sp"
+            android:layout_height="wrap_content"
+            android:layout_row="6"
+            android:layout_column="0"
+            android:layout_columnSpan="5"
+            android:fontFamily="monospace"
+            android:text="Song Name"
+            android:textAlignment="center"
+            android:textSize="20sp" />
 
     </GridLayout>
 
-</LinearLayout>
+    <GridLayout
+        android:id="@+id/gridLayout"
+        android:layout_width="395dp"
+        android:layout_height="92dp"
+        android:columnCount="4"
+        android:gravity="center_horizontal"
+        android:rowCount="2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/gridLayout2"
+        app:layout_constraintVertical_bias="0.939">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/playing"
+            android:layout_width="wrap_content"
+            android:layout_height="90sp"
+            android:layout_row="1"
+            android:layout_column="0"
+            android:layout_columnWeight="1"
+            android:backgroundTint="@color/teal"
+            app:icon="@drawable/ic_music_note"
+            app:iconGravity="textStart"
+            app:iconSize="35sp"
+            app:iconTint="#f00" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/song"
+            android:layout_width="wrap_content"
+            android:layout_height="90sp"
+            android:layout_row="1"
+            android:layout_column="1"
+            android:layout_columnWeight="1"
+            android:layout_marginStart="5sp"
+            android:backgroundTint="@color/teal"
+            android:textColor="@color/white"
+            app:icon="@drawable/ic_queue_music"
+            app:iconGravity="textStart"
+            app:iconSize="35sp"
+            app:iconTint="#f00" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/search"
+            android:layout_width="wrap_content"
+            android:layout_height="90sp"
+            android:layout_row="1"
+            android:layout_column="2"
+            android:layout_columnWeight="1"
+            android:layout_marginStart="5sp"
+            android:backgroundTint="@color/teal"
+            android:textColor="@color/white"
+            app:icon="@drawable/ic_search"
+            app:iconGravity="textStart"
+            app:iconSize="35sp"
+            app:iconTint="#f00" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/settings"
+            android:layout_width="wrap_content"
+            android:layout_height="90sp"
+            android:layout_row="1"
+            android:layout_column="3"
+            android:layout_columnWeight="1"
+            android:layout_marginStart="5sp"
+            android:backgroundTint="@color/teal"
+            android:textColor="@color/white"
+            app:icon="@drawable/ic_calculate"
+            app:iconGravity="textStart"
+            app:iconSize="35sp"
+            app:iconTint="#f00" />
+
+    </GridLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
