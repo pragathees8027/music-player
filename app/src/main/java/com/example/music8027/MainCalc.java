@@ -79,6 +79,7 @@ public class MainCalc extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (curSymbol == '/' || curSymbol == '%'){
+                } else if (inDisp.getText().toString().equals("0")) {
                 } else {
                     inDisp.setText(inDisp.getText() + "0");
                 }
@@ -88,63 +89,90 @@ public class MainCalc extends AppCompatActivity {
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                inDisp.setText(inDisp.getText() + "1");
+                if (inDisp.getText().toString().equals("0"))
+                    inDisp.setText("1");
+                else
+                    inDisp.setText(inDisp.getText() + "1");
             }
         });
 
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                inDisp.setText(inDisp.getText() + "2");
+                if (inDisp.getText().toString().equals("0"))
+                    inDisp.setText("2");
+                else
+                    inDisp.setText(inDisp.getText() + "2");
             }
         });
 
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                inDisp.setText(inDisp.getText() + "3");
+                if (inDisp.getText().toString().equals("0"))
+                    inDisp.setText("3");
+                else
+                    inDisp.setText(inDisp.getText() + "3");
             }
         });
 
         button4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                inDisp.setText(inDisp.getText() + "4");
+                if (inDisp.getText().toString().equals("0"))
+                    inDisp.setText("4");
+                else
+                    inDisp.setText(inDisp.getText() + "4");
             }
         });
 
         button5.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                inDisp.setText(inDisp.getText() + "5");
+                if (inDisp.getText().toString().equals("0"))
+                    inDisp.setText("5");
+                else
+                    inDisp.setText(inDisp.getText() + "5");
             }
         });
 
         button6.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                inDisp.setText(inDisp.getText() + "6");
+                if (inDisp.getText().toString().equals("0"))
+                    inDisp.setText("6");
+                else
+                    inDisp.setText(inDisp.getText() + "6");
             }
         });
 
         button7.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                inDisp.setText(inDisp.getText() + "7");
+                if (inDisp.getText().toString().equals("0"))
+                    inDisp.setText("7");
+                else
+                    inDisp.setText(inDisp.getText() + "7");
             }
         });
 
         button8.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                inDisp.setText(inDisp.getText() + "8");
+                if (inDisp.getText().toString().equals("0"))
+                    inDisp.setText("8");
+                else
+                    inDisp.setText(inDisp.getText() + "8");
             }
         });
 
         button9.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                inDisp.setText(inDisp.getText() + "9");
+                if (inDisp.getText().toString().equals("0"))
+                    inDisp.setText("9");
+                else
+                    inDisp.setText(inDisp.getText() + "9");
             }
         });
 
