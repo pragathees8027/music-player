@@ -1,11 +1,19 @@
 package com.example.music8027;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.media.AudioAttributes;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -16,6 +24,8 @@ public class MainPlay extends AppCompatActivity {
     private String play_state = "playing";
     private String shuffle_state = "shuffle off";
     private String thumb_state = "removed from liked songs";
+    public static final String NOTIFICATION_CHANNEL_ID = "10001" ;
+    private final static String default_notification_channel_id = "default" ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +62,9 @@ public class MainPlay extends AppCompatActivity {
                     play_state = "paused";
                 }
                 Toast.makeText(getApplicationContext(), play_state, Toast.LENGTH_SHORT).show();
+                String title = "Music8027";
+                String content = play_state;
+                push_notifaction(title, content);
             }
         });
 
@@ -84,4 +97,32 @@ public class MainPlay extends AppCompatActivity {
         });
     }
 
+    public void push_notifaction(String notif_title, String notif_content){
+        Uri sound = Uri. parse (ContentResolver. SCHEME_ANDROID_RESOURCE + "://" + getPackageName() + "/raw/quite_impressed.mp3" ) ;
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(MainPlay. this,
+                default_notification_channel_id )
+                .setSmallIcon(R.mipmap.ic_launcher )
+                .setContentTitle(notif_title)
+                .setSound(sound)
+                .setContentText(notif_content);
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context. NOTIFICATION_SERVICE ) ;
+
+        AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .setUsage(AudioAttributes.USAGE_ALARM)
+                .build();
+
+        NotificationChannel notificationChannel = new
+                NotificationChannel( NOTIFICATION_CHANNEL_ID , getText(R.string.app_name) , NotificationManager.IMPORTANCE_HIGH) ;
+        notificationChannel.enableLights( true ) ;
+        notificationChannel.setLightColor(Color. RED ) ;
+        notificationChannel.enableVibration( true ) ;
+        notificationChannel.setVibrationPattern( new long []{ 100 , 200 , 300 , 400 , 500 , 400 , 300 , 200 , 400 }) ;
+        notificationChannel.setSound(sound , audioAttributes) ;
+        mBuilder.setChannelId( NOTIFICATION_CHANNEL_ID ) ;
+        assert mNotificationManager != null;
+        mNotificationManager.createNotificationChannel(notificationChannel) ;
+        assert mNotificationManager != null;
+        mNotificationManager.notify(( int ) System. currentTimeMillis (), mBuilder.build()) ;
+    }
 }
