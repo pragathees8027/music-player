@@ -1,50 +1,46 @@
 package com.example.music8027;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ImageButton;
-import android.widget.Toast;
-
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
-import com.google.android.material.button.MaterialButton;
+import com.example.music8027.databinding.ActivityMainBinding;
+
 
 
 public class MainActivity extends AppCompatActivity {
-    @Override
+    ActivityMainBinding main_binding;
+    public static final String NOTIFICATION_CHANNEL_ID = "10001" ;
+    private final static String default_notification_channel_id = "default" ;
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        main_binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(main_binding.getRoot());
+        replaceFragment(new homeFragment());
 
-        MaterialButton buttonPlaying = (MaterialButton) findViewById(R.id.playing);
-        MaterialButton buttonCalc = (MaterialButton) findViewById(R.id.calculator);
-
-        buttonPlaying.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent Playing = new Intent(view.getContext(), MainPlay.class);
-                view.getContext().startActivity(Playing);
-            }
+        main_binding.mainBar.setOnItemSelectedListener(menuItem -> {
+             if (menuItem.getItemId() == R.id.bar_home){
+                 replaceFragment(new homeFragment());
+             } else if (menuItem.getItemId() == R.id.bar_search){
+                 replaceFragment(new searchFragment());
+             } else if (menuItem.getItemId() == R.id.bar_playing){
+                 replaceFragment(new playFragment());
+             } else if (menuItem.getItemId() == R.id.bar_songs){
+                 replaceFragment(new songsFragment());
+             } else if (menuItem.getItemId() == R.id.bar_settings){
+                 replaceFragment(new settingsFragment());
+             }
+            return true;
         });
+    }
 
-        buttonCalc.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent Calc = new Intent(view.getContext(), MainCalc.class);
-                view.getContext().startActivity(Calc);
-                Toast.makeText(getApplicationContext(), "Loading Calculator", Toast.LENGTH_SHORT).show();
-            }
-        });
+    public void replaceFragment(Fragment fragment) {
+        FragmentManager fragMan = getSupportFragmentManager();
+        FragmentTransaction fragTransact = fragMan.beginTransaction();
+        fragTransact.replace(R.id.mainFrame, fragment);
+        fragTransact.commit();
     }
 }

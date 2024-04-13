@@ -1,0 +1,124 @@
+package com.example.music8027;
+
+import android.os.Bundle;
+
+import androidx.fragment.app.Fragment;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.graphics.Color;
+import android.media.AudioAttributes;
+import android.widget.Toast;
+import androidx.core.app.NotificationCompat;
+
+import com.google.android.material.button.MaterialButton;
+
+public class playFragment extends Fragment {
+    private String play_state = "playing";
+    private String shuffle_state = "shuffle off";
+    private String thumb_state = "removed from liked songs";
+    public static final String NOTIFICATION_CHANNEL_ID = "10001" ;
+    private final static String default_notification_channel_id = "default" ;
+    private Toast toast = null;
+
+    View view;
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.fragment_play, container, false);
+        MaterialButton play = (MaterialButton) view.findViewById(R.id.play);
+        MaterialButton shuffle = (MaterialButton) view.findViewById(R.id.shuffle);
+        MaterialButton thumb = (MaterialButton) view.findViewById(R.id.thumbs);
+
+        play.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (play_state == "paused") {
+                    play.setIconResource(R.drawable.pause_circle_24px);
+                    play.setIconTintResource(R.color.red);
+                    play_state = "playing";
+                } else {
+                    play.setIconResource(R.drawable.play_circle_24px);
+                    play.setIconTintResource(R.color.grey);
+                    play_state = "paused";
+                }
+                if (toast != null)
+                    toast.cancel();
+                toast = Toast.makeText(getActivity(), play_state, Toast.LENGTH_SHORT);
+                toast.show();
+                String title = "Music8027";
+                String content = play_state;
+                push_notifaction(title, content);
+            }
+        });
+
+        shuffle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (shuffle_state == "shuffle on") {
+                    shuffle.setIconResource(R.drawable.shuffle_24px);
+                    shuffle.setIconTintResource(R.color.grey);
+                    shuffle_state = "shuffle off";
+                } else {
+                    shuffle.setIconResource(R.drawable.shuffle_on_24px);
+                    shuffle.setIconTintResource(R.color.red);
+                    shuffle_state = "shuffle on";
+                }
+                if (toast != null)
+                    toast.cancel();
+                toast = Toast.makeText(getActivity(), shuffle_state, Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        });
+
+        thumb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (thumb_state == "added to liked songs") {
+                    thumb.setIconResource(R.drawable.favorite_24px);
+                    thumb.setIconTintResource(R.color.grey);
+                    thumb_state = "removed from liked songs";
+                } else {
+                    thumb.setIconResource(R.drawable.heart_check_24px);
+                    thumb.setIconTintResource(R.color.red);
+                    thumb_state = "added to liked songs";
+                }
+                if (toast != null)
+                    toast.cancel();
+                toast = Toast.makeText(getActivity(), thumb_state, Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        });
+
+        return view;
+    }
+    public void push_notifaction(String notif_title, String notif_content){
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(playFragment.this.requireContext(), default_notification_channel_id )
+                .setSmallIcon(R.drawable.ic_notif)
+                .setContentTitle(notif_title)
+                .setContentText(notif_content);
+        NotificationManager mNotificationManager = (NotificationManager) requireContext().getSystemService(Context. NOTIFICATION_SERVICE ) ;
+
+        AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .setUsage(AudioAttributes.USAGE_ALARM)
+                .build();
+
+        NotificationChannel notificationChannel = new
+                NotificationChannel( NOTIFICATION_CHANNEL_ID , getText(R.string.app_name) , NotificationManager.IMPORTANCE_HIGH) ;
+        notificationChannel.enableLights( true ) ;
+        notificationChannel.setLightColor(Color. RED ) ;
+        notificationChannel.enableVibration( true ) ;
+        notificationChannel.setVibrationPattern( new long []{ 100 , 200 , 300 , 400 , 500 , 400 , 300 , 200 , 400 }) ;
+        mBuilder.setChannelId( NOTIFICATION_CHANNEL_ID ) ;
+        assert mNotificationManager != null;
+        mNotificationManager.createNotificationChannel(notificationChannel) ;
+        mNotificationManager.cancelAll();
+        mNotificationManager.notify(( int ) System. currentTimeMillis (), mBuilder.build()) ;
+    }
+}

@@ -5,10 +5,9 @@
         <item name="colorPrimary">@color/white</item>
         <item name="colorPrimaryVariant">@color/white</item>
         <item name="colorOnPrimary">@color/teal</item>
-        <item name="colorSecondary">@color/black</item>
-        <item name="colorSecondaryVariant">@color/black</item>
+        <item name="colorSecondary">@color/white</item>
+        <item name="colorSecondaryVariant">@color/white</item>
         <item name="colorOnSecondary">@color/teal</item>
-        <item name="android:statusBarColor">@color/teal</item>
     </style>
 
     <style name="Theme.Music8027" parent="Base.Theme.Music8027" />
