@@ -13,5 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
-app/release
-app/debug
+app/release/
+app/debug/
+app/build
+app/debug/app-debug.apk

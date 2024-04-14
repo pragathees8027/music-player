@@ -1,5 +1,6 @@
 package com.example.music8027;
 
+import android.animation.ObjectAnimator;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -13,9 +14,12 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.graphics.Color;
 import android.media.AudioAttributes;
+import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.Toast;
 import androidx.core.app.NotificationCompat;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.button.MaterialButton;
 
 public class playFragment extends Fragment {
@@ -31,6 +35,16 @@ public class playFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_play, container, false);
+        LottieAnimationView animationView = view.findViewById(R.id.play_animation_view);
+
+        SeekBar seek_bar;
+        ProgressBar progress_bar;
+        ObjectAnimator progressAnimator;
+        seek_bar = (SeekBar) view.findViewById(R.id.seekBar);
+        progressAnimator = ObjectAnimator.ofInt(seek_bar, "progress", 0,100);
+        progressAnimator.setDuration(10000);
+        progressAnimator.start();
+
         MaterialButton play = (MaterialButton) view.findViewById(R.id.play);
         MaterialButton shuffle = (MaterialButton) view.findViewById(R.id.shuffle);
         MaterialButton thumb = (MaterialButton) view.findViewById(R.id.thumbs);
@@ -41,10 +55,16 @@ public class playFragment extends Fragment {
                 if (play_state == "paused") {
                     play.setIconResource(R.drawable.pause_circle_24px);
                     play.setIconTintResource(R.color.red);
+                    animationView.playAnimation();
+                    animationView.setVisibility(View.VISIBLE);
+                    progressAnimator.resume();
                     play_state = "playing";
                 } else {
                     play.setIconResource(R.drawable.play_circle_24px);
                     play.setIconTintResource(R.color.grey);
+                    animationView.cancelAnimation();
+                    animationView.setVisibility(View.GONE);
+                    progressAnimator.pause();
                     play_state = "paused";
                 }
                 if (toast != null)
@@ -94,7 +114,6 @@ public class playFragment extends Fragment {
                 toast.show();
             }
         });
-
         return view;
     }
     public void push_notifaction(String notif_title, String notif_content){

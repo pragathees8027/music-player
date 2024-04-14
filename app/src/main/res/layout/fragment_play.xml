@@ -21,16 +21,31 @@
     <GridLayout
         android:id="@+id/gridLayout2"
         android:layout_width="wrap_content"
-        android:layout_height="550sp"
-        android:layout_marginTop="65sp"
+        android:layout_height="650sp"
+        android:layout_marginTop="0sp"
         android:columnCount="5"
-        android:layout_gravity="center_horizontal"
+        android:layout_gravity="center"
         android:rowCount="10">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/play_animation_view"
+            android:layout_width="400sp"
+            android:paddingTop="-35sp"
+            android:layout_height="400sp"
+            android:layout_row="0"
+            android:layout_rowSpan="5"
+            android:layout_column="0"
+            android:layout_columnSpan="5"
+            app:lottie_autoPlay="true"
+
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/lottie_music" />
 
         <ImageView
             android:id="@+id/imageView2"
             android:layout_width="400sp"
-            android:layout_height="300sp"
+            android:paddingTop="45sp"
+            android:layout_height="350sp"
             android:layout_row="0"
             android:layout_rowSpan="5"
             android:layout_column="0"
@@ -110,7 +125,7 @@
         <SeekBar
             android:id="@+id/seekBar"
             android:layout_width="400sp"
-            android:layout_height="30sp"
+            android:layout_height="50sp"
             android:layout_row="8"
             android:layout_column="0"
             android:layout_columnSpan="5"

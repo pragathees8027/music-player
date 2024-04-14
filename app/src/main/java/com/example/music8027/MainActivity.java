@@ -1,19 +1,19 @@
 package com.example.music8027;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
 import com.example.music8027.databinding.ActivityMainBinding;
-
-
 
 public class MainActivity extends AppCompatActivity {
     ActivityMainBinding main_binding;
-    public static final String NOTIFICATION_CHANNEL_ID = "10001" ;
-    private final static String default_notification_channel_id = "default" ;
+    String permission[] = new String[6];
+    public static final String NOTIFICATION_CHANNEL_ID = "Music8027" ;
+    private final static String default_notification_channel_id = "Music8027" ;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,17 +21,42 @@ public class MainActivity extends AppCompatActivity {
         setContentView(main_binding.getRoot());
         replaceFragment(new homeFragment());
 
+        permission[0] = Manifest.permission.READ_EXTERNAL_STORAGE;
+        permission[1] = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+        permission[2] = Manifest.permission.POST_NOTIFICATIONS;
+        permission[3] = Manifest.permission.READ_MEDIA_AUDIO;
+        permission[4] = Manifest.permission.READ_MEDIA_IMAGES;
+        permission[5] = Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED;
+
+        requestPermission();
+
         main_binding.mainBar.setOnItemSelectedListener(menuItem -> {
+            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.mainFrame);
              if (menuItem.getItemId() == R.id.bar_home){
-                 replaceFragment(new homeFragment());
+                 if (currentFragment instanceof homeFragment){
+                 } else {
+                     replaceFragment(new homeFragment());
+                 }
              } else if (menuItem.getItemId() == R.id.bar_search){
-                 replaceFragment(new searchFragment());
+                 if (currentFragment instanceof searchFragment){
+                 } else {
+                     replaceFragment(new searchFragment());
+                 }
              } else if (menuItem.getItemId() == R.id.bar_playing){
-                 replaceFragment(new playFragment());
+                 if (currentFragment instanceof playFragment){
+                 } else {
+                     replaceFragment(new playFragment());
+                 }
              } else if (menuItem.getItemId() == R.id.bar_songs){
-                 replaceFragment(new songsFragment());
+                 if (currentFragment instanceof songsFragment){
+                 } else {
+                     replaceFragment(new songsFragment());
+                 }
              } else if (menuItem.getItemId() == R.id.bar_settings){
-                 replaceFragment(new settingsFragment());
+                 if (currentFragment instanceof settingsFragment){
+                 } else {
+                     replaceFragment(new settingsFragment());
+                 }
              }
             return true;
         });
@@ -39,8 +64,25 @@ public class MainActivity extends AppCompatActivity {
 
     public void replaceFragment(Fragment fragment) {
         FragmentManager fragMan = getSupportFragmentManager();
-        FragmentTransaction fragTransact = fragMan.beginTransaction();
-        fragTransact.replace(R.id.mainFrame, fragment);
-        fragTransact.commit();
+        fragMan.beginTransaction()
+                .setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
+                .replace(R.id.mainFrame, fragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    public void requestPermission() {
+        boolean check = true;
+        for (int i = 0; i < permission.length ; i++){
+            if (ActivityCompat.checkSelfPermission(MainActivity.this, permission[i])
+                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.
+                    checkSelfPermission(MainActivity.this, permission[i])
+                    != PackageManager.PERMISSION_GRANTED){
+                check = false;
+            }
+        }
+        if (check != true ){
+            ActivityCompat.requestPermissions(MainActivity.this, new String[] {permission[0],permission[1],permission[2],permission[3],permission[4],permission[5]}, 1);
+        }
     }
 }

@@ -5,10 +5,27 @@
     android:layout_height="match_parent"
     tools:context=".songsFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:id="@+id/home"
         android:layout_width="match_parent"
+        android:layout_height="60sp"
+        android:layout_marginBottom="12sp"
+        android:fontFamily="monospace"
+        android:padding="10sp"
+        android:text="Songs"
+        android:textAlignment="center"
+        android:textColor="@color/teal"
+        android:textSize="30sp" />
+
+    <ListView
+        android:id="@+id/songs_list"
+        android:layout_width="404sp"
+        android:layout_marginTop="45sp"
+        android:layout_marginBottom="25sp"
+        android:divider="@color/glass"
+        android:dividerHeight="5sp"
+        android:padding="5sp"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_gravity="center"/>
 
 </FrameLayout>
