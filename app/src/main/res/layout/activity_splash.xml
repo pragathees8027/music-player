@@ -12,6 +12,7 @@
         android:id="@+id/animation_view"
         android:layout_width="356dp"
         android:layout_height="472dp"
+        app:lottie_colorFilter="@color/red"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
