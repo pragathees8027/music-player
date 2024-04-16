@@ -15,5 +15,5 @@
 local.properties
 app/release/
 app/debug/
-app/build
-app/debug/app-debug.apk
+app-debug.apk
+app-release.apk

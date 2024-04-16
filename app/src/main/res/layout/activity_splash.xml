@@ -10,25 +10,26 @@
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/animation_view"
-        android:layout_width="224dp"
-        android:layout_height="249dp"
+        android:layout_width="356dp"
+        android:layout_height="472dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.954"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
-        app:lottie_rawRes="@raw/lottie_music" />
-
+        app:lottie_rawRes="@raw/music_fly" />
 
     <ImageButton
         android:id="@+id/imageButton"
-        android:layout_width="105dp"
-        android:layout_height="103dp"
+        android:layout_width="92dp"
+        android:layout_height="88dp"
         android:background="@mipmap/ic_launcher_round_round"
-        app:layout_constraintBottom_toBottomOf="@+id/animation_view"
-        app:layout_constraintEnd_toEndOf="@+id/animation_view"
-        app:layout_constraintStart_toStartOf="@+id/animation_view"
-        app:layout_constraintTop_toTopOf="@+id/animation_view" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
