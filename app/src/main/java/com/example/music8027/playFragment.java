@@ -67,10 +67,10 @@ public class playFragment extends Fragment {
                     progressAnimator.pause();
                     play_state = "paused";
                 }
-                if (toast != null)
+               /* if (toast != null)
                     toast.cancel();
                 toast = Toast.makeText(getActivity(), play_state, Toast.LENGTH_SHORT);
-                toast.show();
+                toast.show();*/
                 String title = "Music8027";
                 String content = play_state;
                 push_notifaction(title, content);
@@ -119,21 +119,22 @@ public class playFragment extends Fragment {
     public void push_notifaction(String notif_title, String notif_content){
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(playFragment.this.requireContext(), default_notification_channel_id )
                 .setSmallIcon(R.drawable.ic_notif)
+                .setSilent(true)
                 .setContentTitle(notif_title)
                 .setContentText(notif_content);
         NotificationManager mNotificationManager = (NotificationManager) requireContext().getSystemService(Context. NOTIFICATION_SERVICE ) ;
 
         AudioAttributes audioAttributes = new AudioAttributes.Builder()
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .setUsage(AudioAttributes.USAGE_ALARM)
+                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                .setUsage(AudioAttributes.USAGE_MEDIA)
                 .build();
 
         NotificationChannel notificationChannel = new
                 NotificationChannel( NOTIFICATION_CHANNEL_ID , getText(R.string.app_name) , NotificationManager.IMPORTANCE_HIGH) ;
         notificationChannel.enableLights( true ) ;
         notificationChannel.setLightColor(Color. RED ) ;
-        notificationChannel.enableVibration( true ) ;
-        notificationChannel.setVibrationPattern( new long []{ 100 , 200 , 300 , 400 , 500 , 400 , 300 , 200 , 400 }) ;
+        notificationChannel.enableVibration( false ) ;
+        notificationChannel.setVibrationPattern( new long []{ 0 }) ;
         mBuilder.setChannelId( NOTIFICATION_CHANNEL_ID ) ;
         assert mNotificationManager != null;
         mNotificationManager.createNotificationChannel(notificationChannel) ;
