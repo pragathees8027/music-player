@@ -14,6 +14,8 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.graphics.Color;
 import android.media.AudioAttributes;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -48,24 +50,34 @@ public class playFragment extends Fragment {
         MaterialButton play = (MaterialButton) view.findViewById(R.id.play);
         MaterialButton shuffle = (MaterialButton) view.findViewById(R.id.shuffle);
         MaterialButton thumb = (MaterialButton) view.findViewById(R.id.thumbs);
+        MaterialButton forward = (MaterialButton) view.findViewById(R.id.next);
+        MaterialButton backward = (MaterialButton) view.findViewById(R.id.previous);
 
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (play_state == "paused") {
+                    Animation zoom_out = AnimationUtils.loadAnimation(getContext(), R.anim.zoom_out);
+                    view.startAnimation(zoom_out);
                     play.setIconResource(R.drawable.pause_circle_24px);
                     play.setIconTintResource(R.color.red);
                     animationView.playAnimation();
                     animationView.setVisibility(View.VISIBLE);
                     progressAnimator.resume();
                     play_state = "playing";
+                    Animation zoom_in = AnimationUtils.loadAnimation(getContext(), R.anim.zoom_in);
+                    view.startAnimation(zoom_in);
                 } else {
+                    Animation zoom_out = AnimationUtils.loadAnimation(getContext(), R.anim.zoom_out);
+                    view.startAnimation(zoom_out);
                     play.setIconResource(R.drawable.play_circle_24px);
-                    play.setIconTintResource(R.color.grey);
+                    play.setIconTintResource(R.color.red);
                     animationView.cancelAnimation();
                     animationView.setVisibility(View.GONE);
                     progressAnimator.pause();
                     play_state = "paused";
+                    Animation zoom_in = AnimationUtils.loadAnimation(getContext(), R.anim.zoom_in);
+                    view.startAnimation(zoom_in);
                 }
                /* if (toast != null)
                     toast.cancel();
@@ -81,13 +93,21 @@ public class playFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if (shuffle_state == "shuffle on") {
+                    Animation zoom_out = AnimationUtils.loadAnimation(getContext(), R.anim.zoom_out);
+                    view.startAnimation(zoom_out);
                     shuffle.setIconResource(R.drawable.shuffle_24px);
                     shuffle.setIconTintResource(R.color.grey);
                     shuffle_state = "shuffle off";
+                    Animation zoom_in = AnimationUtils.loadAnimation(getContext(), R.anim.zoom_in);
+                    view.startAnimation(zoom_in);
                 } else {
+                    Animation zoom_out = AnimationUtils.loadAnimation(getContext(), R.anim.zoom_out);
+                    view.startAnimation(zoom_out);
                     shuffle.setIconResource(R.drawable.shuffle_on_24px);
                     shuffle.setIconTintResource(R.color.red);
                     shuffle_state = "shuffle on";
+                    Animation zoom_in = AnimationUtils.loadAnimation(getContext(), R.anim.zoom_in);
+                    view.startAnimation(zoom_in);
                 }
                 if (toast != null)
                     toast.cancel();
@@ -100,13 +120,21 @@ public class playFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if (thumb_state == "added to liked songs") {
+                    Animation zoom_out = AnimationUtils.loadAnimation(getContext(), R.anim.zoom_out);
+                    view.startAnimation(zoom_out);
                     thumb.setIconResource(R.drawable.favorite_24px);
                     thumb.setIconTintResource(R.color.grey);
                     thumb_state = "removed from liked songs";
+                    Animation zoom_in = AnimationUtils.loadAnimation(getContext(), R.anim.zoom_in);
+                    view.startAnimation(zoom_in);
                 } else {
+                    Animation zoom_out = AnimationUtils.loadAnimation(getContext(), R.anim.zoom_out);
+                    view.startAnimation(zoom_out);
                     thumb.setIconResource(R.drawable.heart_check_24px);
                     thumb.setIconTintResource(R.color.red);
                     thumb_state = "added to liked songs";
+                    Animation zoom_in = AnimationUtils.loadAnimation(getContext(), R.anim.zoom_in);
+                    view.startAnimation(zoom_in);
                 }
                 if (toast != null)
                     toast.cancel();
@@ -114,6 +142,29 @@ public class playFragment extends Fragment {
                 toast.show();
             }
         });
+
+        forward.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Animation zoom_out = AnimationUtils.loadAnimation(getContext(), R.anim.zoom_out);
+                view.startAnimation(zoom_out);
+                progressAnimator.start();
+                Animation zoom_in = AnimationUtils.loadAnimation(getContext(), R.anim.zoom_in);
+                view.startAnimation(zoom_in);
+            }
+        });
+
+        backward.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Animation zoom_out = AnimationUtils.loadAnimation(getContext(), R.anim.zoom_out);
+                view.startAnimation(zoom_out);
+                progressAnimator.start();
+                Animation zoom_in = AnimationUtils.loadAnimation(getContext(), R.anim.zoom_in);
+                view.startAnimation(zoom_in);
+            }
+        });
+
         return view;
     }
     public void push_notifaction(String notif_title, String notif_content){
