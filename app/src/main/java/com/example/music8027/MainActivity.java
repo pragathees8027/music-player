@@ -85,4 +85,23 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(MainActivity.this, new String[] {permission[0],permission[1],permission[2],permission[3],permission[4],permission[5]}, 1);
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.mainFrame);
+            if (currentFragment instanceof homeFragment){
+                main_binding.mainBar.setSelectedItemId(R.id.bar_home);
+            } else if (currentFragment instanceof searchFragment){
+                main_binding.mainBar.setSelectedItemId(R.id.bar_search);
+            } else if (currentFragment instanceof playFragment){
+                main_binding.mainBar.setSelectedItemId(R.id.bar_playing);
+            } else if (currentFragment instanceof songsFragment){
+                main_binding.mainBar.setSelectedItemId(R.id.bar_songs);
+            } else if (currentFragment instanceof settingsFragment){
+                main_binding.mainBar.setSelectedItemId(R.id.bar_settings);
+            } else {
+                finish();
+            }
+        }
 }

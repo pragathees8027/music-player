@@ -5,10 +5,17 @@
     android:layout_height="match_parent"
     tools:context=".searchFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <android.opengl.GLSurfaceView
+        android:id="@+id/glsurfaceview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="match_parent"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Search"
+        android:textSize="40sp"
+        android:layout_gravity="center">
+    </TextView>
 
 </FrameLayout>
