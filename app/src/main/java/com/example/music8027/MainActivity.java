@@ -2,6 +2,7 @@ package com.example.music8027;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -11,9 +12,7 @@ import com.example.music8027.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
     ActivityMainBinding main_binding;
-    String permission[] = new String[6];
-    public static final String NOTIFICATION_CHANNEL_ID = "Music8027" ;
-    private final static String default_notification_channel_id = "Music8027" ;
+    String[] permission = new String[6];
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,10 +22,14 @@ public class MainActivity extends AppCompatActivity {
 
         permission[0] = Manifest.permission.READ_EXTERNAL_STORAGE;
         permission[1] = Manifest.permission.WRITE_EXTERNAL_STORAGE;
-        permission[2] = Manifest.permission.POST_NOTIFICATIONS;
-        permission[3] = Manifest.permission.READ_MEDIA_AUDIO;
-        permission[4] = Manifest.permission.READ_MEDIA_IMAGES;
-        permission[5] = Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permission[2] = Manifest.permission.POST_NOTIFICATIONS;
+            permission[3] = Manifest.permission.READ_MEDIA_AUDIO;
+            permission[4] = Manifest.permission.READ_MEDIA_IMAGES;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                permission[5] = Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED;
+            }
+        }
 
         requestPermission();
 
@@ -72,16 +75,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void requestPermission() {
-        boolean check = true;
-        for (int i = 0; i < permission.length ; i++){
-            if (ActivityCompat.checkSelfPermission(MainActivity.this, permission[i])
+        boolean req = false;
+        for (String s : permission) {
+            if (ActivityCompat.checkSelfPermission(MainActivity.this, s)
                     != PackageManager.PERMISSION_GRANTED && ActivityCompat.
-                    checkSelfPermission(MainActivity.this, permission[i])
-                    != PackageManager.PERMISSION_GRANTED){
-                check = false;
+                    checkSelfPermission(MainActivity.this, s)
+                    != PackageManager.PERMISSION_GRANTED) {
+                req = true;
             }
         }
-        if (check != true ){
+        if (req){
             ActivityCompat.requestPermissions(MainActivity.this, new String[] {permission[0],permission[1],permission[2],permission[3],permission[4],permission[5]}, 1);
         }
     }
