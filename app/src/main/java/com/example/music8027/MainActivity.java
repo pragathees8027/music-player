@@ -12,7 +12,7 @@ import com.example.music8027.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
     ActivityMainBinding main_binding;
-    String[] permission = new String[6];
+    String[] permission = new String[7];
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
                 permission[5] = Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED;
             }
         }
+        permission[6] = Manifest.permission.INTERNET;
 
         requestPermission();
 
@@ -85,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         if (req){
-            ActivityCompat.requestPermissions(MainActivity.this, new String[] {permission[0],permission[1],permission[2],permission[3],permission[4],permission[5]}, 1);
+            ActivityCompat.requestPermissions(MainActivity.this, new String[] {permission[0],permission[1],permission[2],permission[3],permission[4],permission[5],permission[6]}, 1);
         }
     }
 

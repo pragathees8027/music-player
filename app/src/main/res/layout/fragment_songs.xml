@@ -1,31 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".songsFragment">
 
-    <TextView
-        android:id="@+id/home"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="60sp"
-        android:layout_marginBottom="12sp"
-        android:fontFamily="monospace"
-        android:padding="10sp"
-        android:text="Songs"
-        android:textAlignment="center"
-        android:textColor="@color/teal"
-        android:textSize="30sp" />
+        android:layout_height="match_parent">
 
-    <ListView
-        android:id="@+id/songs_list"
-        android:layout_width="404sp"
-        android:layout_marginTop="45sp"
-        android:layout_marginBottom="25sp"
-        android:divider="@color/glass"
-        android:dividerHeight="5sp"
-        android:padding="5sp"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"/>
+        <TextView
+            android:id="@+id/home"
+            android:layout_width="match_parent"
+            android:layout_height="60sp"
+            android:fontFamily="monospace"
+            android:padding="10sp"
+            android:text="Songs"
+            android:textAlignment="center"
+            android:textColor="@color/teal"
+            android:textSize="30sp"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_editor_absoluteX="0dp" />
+
+        <ListView
+            android:id="@+id/songs_list"
+            android:layout_width="404sp"
+            android:layout_marginTop="60sp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:divider="@color/glass"
+            android:dividerHeight="5sp"
+            android:padding="5sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/home" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>

@@ -44,5 +44,6 @@ dependencies {
     implementation(libs.lottie)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    implementation("org.apache.directory.studio:org.apache.commons.io:2.4")
 }
 

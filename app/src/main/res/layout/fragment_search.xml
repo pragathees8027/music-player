@@ -3,19 +3,72 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".searchFragment">
 
-    <android.opengl.GLSurfaceView
-        android:id="@+id/glsurfaceview"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Search"
-        android:textSize="40sp"
-        android:layout_gravity="center">
-    </TextView>
+        <TextView
+            android:id="@+id/home"
+            android:layout_width="match_parent"
+            android:layout_height="60sp"
+            android:fontFamily="monospace"
+            android:padding="10sp"
+            android:text="Search Songs"
+            android:textAlignment="center"
+            android:textColor="@color/teal"
+            android:textSize="30sp"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_editor_absoluteX="0dp" />
+
+        <TextView
+            android:id="@+id/search_input"
+            android:layout_width="280sp"
+            android:layout_height="80sp"
+            android:layout_gravity="center"
+            android:background="@color/glass_teal"
+            android:gravity="center_vertical"
+            android:text=""
+            android:textSize="30sp"
+            app:layout_constraintBottom_toBottomOf="@+id/search_button"
+            app:layout_constraintEnd_toStartOf="@+id/search_button"
+            app:layout_constraintHorizontal_bias="0.457"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/search_button"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/search_button"
+            android:layout_width="80sp"
+            android:layout_height="80sp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="16dp"
+            android:backgroundTint="@color/glass_teal"
+            app:icon="@drawable/ic_search_black_24dp"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="30sp"
+            app:iconTint="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/home">
+        </com.google.android.material.button.MaterialButton>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/song_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            android:layout_marginTop="170sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:layout_editor_absoluteY="121dp"
+            tools:listitem="@layout/list_item">
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>
