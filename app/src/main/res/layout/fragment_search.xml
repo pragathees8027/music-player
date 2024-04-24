@@ -23,15 +23,15 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:layout_editor_absoluteX="0dp" />
 
-        <TextView
+        <EditText
             android:id="@+id/search_input"
             android:layout_width="280sp"
             android:layout_height="80sp"
             android:layout_gravity="center"
-            android:background="@color/glass_teal"
             android:gravity="center_vertical"
-            android:text=""
-            android:textSize="30sp"
+            android:textSize="20sp"
+            android:hint="Enter song name"
+            android:textColorHint="@color/glass_teal"
             app:layout_constraintBottom_toBottomOf="@+id/search_button"
             app:layout_constraintEnd_toStartOf="@+id/search_button"
             app:layout_constraintHorizontal_bias="0.457"
@@ -45,7 +45,7 @@
             android:layout_height="80sp"
             android:layout_marginTop="12dp"
             android:layout_marginEnd="16dp"
-            android:backgroundTint="@color/glass_teal"
+            android:backgroundTint="@color/blue"
             app:icon="@drawable/ic_search_black_24dp"
             app:iconGravity="textStart"
             app:iconPadding="0dp"
@@ -56,11 +56,12 @@
         </com.google.android.material.button.MaterialButton>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/song_list_view"
+            android:id="@+id/song_recycle_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollbars="vertical"
             android:layout_marginTop="170sp"
+            android:padding="10sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -68,6 +69,34 @@
             tools:listitem="@layout/list_item">
 
         </androidx.recyclerview.widget.RecyclerView>
+
+        <ProgressBar
+            android:id="@+id/loading_progress"
+            android:layout_width="100sp"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:paddingStart="50sp"
+            android:visibility="gone"
+            android:progressTint="@color/blue"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/loading_animation"
+            android:layout_width="145dp"
+            android:layout_height="158dp"
+            android:layout_centerInParent="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.55"
+            app:lottie_autoPlay="true"
+            android:visibility="gone"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/lottie_4_diamond_loading" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

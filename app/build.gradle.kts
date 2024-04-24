@@ -22,6 +22,7 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
@@ -47,5 +48,7 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation("commons-io:commons-io:2.4")
+    implementation("androidx.appcompat:appcompat:1.3.0")
+    implementation("com.squareup.picasso:picasso:2.71828")
 }
 
