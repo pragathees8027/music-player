@@ -70,19 +70,6 @@
 
         </androidx.recyclerview.widget.RecyclerView>
 
-        <ProgressBar
-            android:id="@+id/loading_progress"
-            android:layout_width="100sp"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:paddingStart="50sp"
-            android:visibility="gone"
-            android:progressTint="@color/blue"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/loading_animation"
             android:layout_width="145dp"
