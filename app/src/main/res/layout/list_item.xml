@@ -18,7 +18,7 @@
             android:layout_height="80sp"
             android:layout_marginStart="10sp"
             android:columnCount="5"
-            android:rowCount="1"
+            android:rowCount="2"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -28,6 +28,7 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_row="0"
                 android:layout_column="0"
+                android:layout_rowSpan="2"
                 android:backgroundTint="@color/glass"
                 app:cardCornerRadius="50dp"
                 android:layout_width="80sp"
@@ -44,17 +45,37 @@
             <TextView
                 android:id="@+id/song_name"
                 android:layout_width="wrap_content"
-                android:layout_height="80sp"
-                android:paddingStart="10sp"
+                android:layout_height="40sp"
+                android:paddingStart="15sp"
                 android:paddingEnd="10sp"
                 android:layout_row="0"
                 android:layout_column="1"
-                android:layout_columnSpan="1"
-                android:layout_marginStart="10sp"
+                android:layout_columnSpan="4"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_marginBottom="2sp"
                 android:gravity="center_vertical"
                 android:text="Song Name"
                 android:textColor="@android:color/black"
-                android:textSize="28sp" />
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/song_info"
+                android:layout_width="wrap_content"
+                android:layout_height="30sp"
+                android:paddingStart="16sp"
+                android:paddingEnd="10sp"
+                android:layout_row="1"
+                android:layout_column="1"
+                android:layout_columnSpan="4"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_marginBottom="5sp"
+                android:gravity="center_vertical"
+                android:text="Song Info"
+                android:fontFamily="monospace"
+                android:textColor="@android:color/white"
+                android:textSize="15sp" />
 
         </GridLayout>
 

@@ -25,13 +25,15 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemVi
 
     public static class ItemViewHolder extends RecyclerView.ViewHolder {
 
-        private final TextView name;
-        private final ImageView art;
+        private final TextView song_name;
+        private final TextView song_info;
+        private final ImageView song_art;
 
         public ItemViewHolder(@NonNull View itemView) {
             super(itemView);
-            name = itemView.findViewById(R.id.song_name);
-            art = itemView.findViewById(R.id.album_art);
+            song_name = itemView.findViewById(R.id.song_name);
+            song_info = itemView.findViewById(R.id.song_info);
+            song_art = itemView.findViewById(R.id.album_art);
         }
     }
 
@@ -46,8 +48,21 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemVi
     @Override
     public void onBindViewHolder(@NonNull ItemViewHolder viewHolder, int i) {
         songUnit songUnit = (songUnit) listRecyclerItem.get(i);
-        viewHolder.name.setText(songUnit.getName());
-        Picasso.get().load(songUnit.getArt()).into(viewHolder.art);
+
+        if (songUnit.getType().equals("song")) {
+            viewHolder.song_name.setText(songUnit.getTitle());
+            viewHolder.song_info.setText(String.format("%s - %s", songUnit.getSingers(), songUnit.getAlbum()));
+            Picasso.get().load(songUnit.getImage()).into(viewHolder.song_art);
+        } else {
+            if (songUnit.getSingers() == null) {
+                viewHolder.song_name.setText(songUnit.getTitle());
+                viewHolder.song_info.setText(String.format(songUnit.getType()));
+            } else {
+                viewHolder.song_name.setText(songUnit.getTitle());
+                viewHolder.song_info.setText(String.format("%s ( %s )", songUnit.getType(), songUnit.getSingers()));
+            }
+            Picasso.get().load(songUnit.getImage()).into(viewHolder.song_art);
+        }
     }
 
     @Override
