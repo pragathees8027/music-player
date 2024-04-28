@@ -10,7 +10,6 @@ import android.widget.EditText;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
@@ -24,7 +23,6 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -33,14 +31,14 @@ import java.util.List;
 public class searchFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private List<Object> viewItems = new ArrayList<>();
-    private List<songUnit> songUnits;
+    private ArrayList<JSONObject> searchResult;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
+    private GridLayoutManager gridLayoutManager;
     private EditText searchSong;
     private static final String TAG = "searchFragment";
     private String songName = null;
     private String searchSpecifier = "";
-    private int spanCount;
     private LottieAnimationView loadingAnimation;
 
     @Override
@@ -51,15 +49,18 @@ public class searchFragment extends Fragment {
         mRecyclerView = view.findViewById(R.id.song_recycle_view);
         mRecyclerView.setHasFixedSize(true);
 
-        //layoutManager = new LinearLayoutManager(getContext());
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
+        gridLayoutManager = new GridLayoutManager(getContext(), 2);
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                if (songUnits.get(position).getType().equals("song")) {
-                    return 2;
+                try {
+                    JSONObject searchItem = searchResult.get(position);
+                    if (searchItem.getString("type").equals("song"))
+                        return 2;
+                    return 1;
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
                 }
-                return 1;
             }
         });
 
@@ -126,7 +127,7 @@ public class searchFragment extends Fragment {
         return view;
     }
 
-    private class FetchDataTask extends AsyncTask<String, Void, List<songUnit>> {
+    private class FetchDataTask extends AsyncTask<String, Void, ArrayList<JSONObject>> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -135,10 +136,9 @@ public class searchFragment extends Fragment {
         }
 
         @Override
-        protected List<songUnit> doInBackground(String... params) {
+        protected ArrayList<JSONObject> doInBackground(String... params) {
             String searchName = params[0];
-            //List<songUnit> songUnits = new ArrayList<>();
-            songUnits = new ArrayList<>();
+            searchResult = new ArrayList<JSONObject>();
             try {
                 URL url = new URL("https://saavn.dev/api/search"+ searchSpecifier +"?query=" + searchName);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -165,50 +165,20 @@ public class searchFragment extends Fragment {
                 for (JSONArray array : result) {
                     for (int i = 0; i < array.length(); ++i) {
                         JSONObject itemObj = array.getJSONObject(i);
-                        String id = itemObj.getString("id");
-                        String type = itemObj.getString("type");
-                        String title = itemObj.getString("title");
-                        String image = itemObj.getJSONArray("image").getJSONObject(2).getString("url");
-                        String album = null;
-                        String itemUrl = null;
-                        String singers = null;
-                        String language = null;
-                        String songIDs = null;
-
-                        switch (type){
-                            case "song":
-                                album = itemObj.getString("album");
-                                singers = itemObj.getString("singers");
-                                language = itemObj.getString("language");
-                                break;
-
-                            case "album":
-                                singers = itemObj.getString("artist");
-                                language = itemObj.getString("language");
-                                itemUrl = itemObj.getString("url");
-                                songIDs = itemObj.getString("songIds");
-                                break;
-
-                            case "playlist":
-                                language = itemObj.getString("language");
-                                itemUrl = itemObj.getString("url");
-                                break;
-                        }
-                        songUnits.add(new songUnit(id, title, image, album, itemUrl, type, singers, language, songIDs));
+                        searchResult.add(itemObj);
                     }
                 }
-
                 connection.disconnect();
             } catch (IOException | JSONException e) {
                 Log.e(TAG, "Error fetching data", e);
             }
-            return songUnits;
+            return searchResult;
         }
 
         @Override
-        protected void onPostExecute(List<songUnit> songUnits) {
+        protected void onPostExecute(ArrayList<JSONObject> songUnits) {
             viewItems.clear();
-            viewItems.addAll(songUnits);
+            viewItems.addAll(searchResult);
             mAdapter.notifyDataSetChanged();
             loadingAnimation.setVisibility(View.GONE);
             mRecyclerView.setVisibility(View.VISIBLE);

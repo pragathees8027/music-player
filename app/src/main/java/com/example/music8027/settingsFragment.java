@@ -26,7 +26,7 @@ public class settingsFragment extends Fragment {
     private static final char div = '/';
     private static final char mod = '%';
     private char curSymbol = '0';
-    private double firstVal = Double.NaN;
+    private double firstVal;
     private double secondVal;
     private TextView inDisp, outDisp;
     private DecimalFormat decForm;

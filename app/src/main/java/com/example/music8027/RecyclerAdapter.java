@@ -12,6 +12,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.List;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemViewHolder> {
@@ -26,10 +29,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemVi
     @Override
     public int getItemViewType(int position)
     {
-        songUnit currentUnit = (songUnit) listRecyclerItem.get(position);
-        if (currentUnit.getType().equals("song"))
-                return 1;
-        return 0;
+        JSONObject currentUnit = (JSONObject) listRecyclerItem.get(position);
+        try {
+            if (currentUnit.getString("type").equals("song"))
+                    return 1;
+            return 0;
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static class ItemViewHolder extends RecyclerView.ViewHolder {
@@ -62,21 +69,23 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemVi
 
     @Override
     public void onBindViewHolder(@NonNull ItemViewHolder viewHolder, int i) {
-        songUnit songUnit = (songUnit) listRecyclerItem.get(i);
+        JSONObject songUnit = (JSONObject) listRecyclerItem.get(i);
 
-        if (songUnit.getType().equals("song")) {
-            viewHolder.song_name.setText(songUnit.getTitle());
-            viewHolder.song_info.setText(String.format("%s - %s", songUnit.getSingers(), songUnit.getAlbum()));
-        } else {
-            if (songUnit.getSingers() == null) {
-                viewHolder.song_name.setText(songUnit.getTitle());
-                viewHolder.song_info.setText(String.format(songUnit.getType()));
-            } else {
-                viewHolder.song_name.setText(songUnit.getTitle());
-                viewHolder.song_info.setText(String.format("%s ( %s )", songUnit.getType(), songUnit.getSingers()));
+        try {
+            if (songUnit.getString("type").equals("song")) {
+                viewHolder.song_info.setText(String.format("%s - %s", songUnit.getString("title"), songUnit.getString("album")));
+            } else if (songUnit.getString("type").equals("album")) {
+                viewHolder.song_info.setText(String.format("%s ( %s )", songUnit.getString("type"), songUnit.getString("artist")));
+            } else if (songUnit.getString("type").equals("artist")) {
+                viewHolder.song_info.setText(String.format(songUnit.getString("type")));
+            } else if (songUnit.getString("type").equals("playlist")) {
+                viewHolder.song_info.setText(String.format("%s\n( %s )", songUnit.getString("type"), songUnit.getString("language")));
             }
+            viewHolder.song_name.setText(songUnit.getString("title"));
+            Picasso.get().load(songUnit.getJSONArray("image").getJSONObject(2).getString("url")).into(viewHolder.song_art);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
         }
-        Picasso.get().load(songUnit.getImage()).into(viewHolder.song_art);
     }
 
     @Override

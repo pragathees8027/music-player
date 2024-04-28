@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -15,7 +16,7 @@ import com.example.music8027.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding mainBinding;
     private String[] permissions = new String[7];
-    private boolean startUp = true;
+    private long mBackPressed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         if (!fragmentPopped) {
             fragmentManager.beginTransaction()
                     .setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                    .replace(R.id.mainFrame, fragment)
+                    .replace(R.id.mainFrame, fragment, fragment.getClass().getName())
                     .addToBackStack(fragment.getClass().getName())
                     .commit();
         }
@@ -100,6 +101,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        if (mBackPressed + 300 > System.currentTimeMillis()) {
+            Toast.makeText(getBaseContext(), "App closed", Toast.LENGTH_SHORT).show();
+            finish();
+        }
         super.onBackPressed();
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.mainFrame);
         if (currentFragment instanceof homeFragment) {
@@ -115,5 +120,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             finish();
         }
+        mBackPressed = System.currentTimeMillis();
     }
 }
