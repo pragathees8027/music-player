@@ -23,6 +23,15 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemVi
         this.listRecyclerItem = listRecyclerItem;
     }
 
+    @Override
+    public int getItemViewType(int position)
+    {
+        songUnit currentUnit = (songUnit) listRecyclerItem.get(position);
+        if (currentUnit.getType().equals("song"))
+                return 1;
+        return 0;
+    }
+
     public static class ItemViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView song_name;
@@ -39,9 +48,15 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemVi
 
     @NonNull
     @Override
-    public ItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+    public ItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int type) {
+        if (type == 1) {
+            View layoutView = LayoutInflater.from(viewGroup.getContext()).inflate(
+                    R.layout.list_item, viewGroup, false);
+            return new ItemViewHolder(layoutView);
+        }
+
         View layoutView = LayoutInflater.from(viewGroup.getContext()).inflate(
-                R.layout.list_item, viewGroup, false);
+                R.layout.list_item_square, viewGroup, false);
         return new ItemViewHolder(layoutView);
     }
 
@@ -52,7 +67,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemVi
         if (songUnit.getType().equals("song")) {
             viewHolder.song_name.setText(songUnit.getTitle());
             viewHolder.song_info.setText(String.format("%s - %s", songUnit.getSingers(), songUnit.getAlbum()));
-            Picasso.get().load(songUnit.getImage()).into(viewHolder.song_art);
         } else {
             if (songUnit.getSingers() == null) {
                 viewHolder.song_name.setText(songUnit.getTitle());
@@ -61,8 +75,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemVi
                 viewHolder.song_name.setText(songUnit.getTitle());
                 viewHolder.song_info.setText(String.format("%s ( %s )", songUnit.getType(), songUnit.getSingers()));
             }
-            Picasso.get().load(songUnit.getImage()).into(viewHolder.song_art);
         }
+        Picasso.get().load(songUnit.getImage()).into(viewHolder.song_art);
     }
 
     @Override

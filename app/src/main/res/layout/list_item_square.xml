@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="190sp"
+    android:layout_height="270sp"
+    app:cardCornerRadius="5dp"
+    android:orientation="horizontal"
+    android:backgroundTint="@color/light_grey"
+    android:layout_marginStart="10dp"
+    android:layout_marginEnd="5sp"
+    android:layout_marginTop="15sp"
+    android:layout_marginBottom="15sp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <GridLayout
+            android:id="@+id/gridLayout4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="4"
+            android:paddingStart="5sp"
+            android:paddingEnd="5sp"
+            android:rowCount="6"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/album_art"
+                android:layout_width="180sp"
+                android:layout_height="180sp"
+                android:layout_row="0"
+                android:layout_rowSpan="4"
+                android:layout_column="0"
+                android:layout_columnSpan="4"
+                android:contentDescription="album art" />
+
+            <TextView
+                android:id="@+id/song_name"
+                android:layout_width="match_parent"
+                android:layout_height="40sp"
+                android:layout_row="4"
+                android:layout_column="0"
+                android:layout_columnSpan="4"
+                android:layout_marginTop="5sp"
+                android:autoSizeTextType="uniform"
+                android:fontFamily="@font/poppins"
+                android:gravity="center"
+                android:text="Item Name"
+                android:textColor="@android:color/black" />
+
+            <TextView
+                android:id="@+id/song_info"
+                android:layout_width="match_parent"
+                android:layout_height="35sp"
+                android:layout_row="5"
+                android:layout_column="0"
+                android:layout_columnSpan="4"
+                android:autoSizeMaxTextSize="15sp"
+                android:autoSizeTextType="uniform"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:text="Song Info"
+                android:textColor="@android:color/white" />
+
+        </GridLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

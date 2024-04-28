@@ -3,9 +3,12 @@
     <color name="black">#FF000000</color>
     <color name="white">#ECEFF1</color>
     <color name="red">#E53935</color>
+    <color name="glass_red">#99E53935</color>
     <color name="blue">#1976D2</color>
+    <color name="glass_blue">#991976D2</color>
     <color name="teal">#4DB6AC</color>
     <color name="glass_teal">#994DB6AC</color>
     <color name="glass">#00000000</color>
     <color name="grey">#636161</color>
+    <color name="light_grey">#BCC1CD</color>
 </resources>

@@ -46,7 +46,6 @@
                 android:layout_columnSpan="5"
                 android:paddingTop="-35sp"
                 app:lottie_autoPlay="true"
-
                 app:lottie_loop="true"
                 app:lottie_rawRes="@raw/lottie_music" />
 
@@ -151,6 +150,7 @@
                 android:layout_marginBottom="20sp"
                 android:fontFamily="monospace"
                 android:text="Singer"
+                android:singleLine="true"
                 android:textAlignment="center"
                 android:textSize="20sp" />
 
@@ -161,7 +161,8 @@
                 android:layout_row="6"
                 android:layout_column="0"
                 android:layout_columnSpan="5"
-                android:fontFamily="monospace"
+                android:singleLine="true"
+                android:fontFamily="@font/poppins"
                 android:text="Song Name"
                 android:textAlignment="center"
                 android:textSize="20sp" />

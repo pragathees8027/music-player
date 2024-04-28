@@ -9,11 +9,13 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,15 +32,15 @@ import java.util.List;
 
 public class searchFragment extends Fragment {
     private RecyclerView mRecyclerView;
-    private RecyclerView nRecyclerView;
     private List<Object> viewItems = new ArrayList<>();
+    private List<songUnit> songUnits;
     private RecyclerView.Adapter mAdapter;
-    private RecyclerView.Adapter nAdapter;
     private RecyclerView.LayoutManager layoutManager;
-    private RecyclerView.LayoutManager nlayoutManager;
     private EditText searchSong;
     private static final String TAG = "searchFragment";
     private String songName = null;
+    private String searchSpecifier = "";
+    private int spanCount;
     private LottieAnimationView loadingAnimation;
 
     @Override
@@ -49,13 +51,30 @@ public class searchFragment extends Fragment {
         mRecyclerView = view.findViewById(R.id.song_recycle_view);
         mRecyclerView.setHasFixedSize(true);
 
-        layoutManager = new LinearLayoutManager(getContext());
+        //layoutManager = new LinearLayoutManager(getContext());
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
+        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                if (songUnits.get(position).getType().equals("song")) {
+                    return 2;
+                }
+                return 1;
+            }
+        });
+
+        layoutManager = gridLayoutManager;
         mRecyclerView.setLayoutManager(layoutManager);
 
         mAdapter = new RecyclerAdapter(getContext(), viewItems);
         mRecyclerView.setAdapter(mAdapter);
 
         MaterialButton search = view.findViewById(R.id.search_button);
+        MaterialButtonToggleGroup searchSpec = view.findViewById(R.id.search_specifier);
+        MaterialButton songBtn = view.findViewById(R.id.songSearch);
+        MaterialButton albumBtn = view.findViewById(R.id.albumSearch);
+        MaterialButton artistBtn = view.findViewById(R.id.artistSearch);
+        MaterialButton playlistBtn = view.findViewById(R.id.playlistSearch);
         searchSong = view.findViewById(R.id.search_input);
         loadingAnimation = view.findViewById(R.id.loading_animation);
 
@@ -65,6 +84,42 @@ public class searchFragment extends Fragment {
                 songName = searchSong.getText().toString();
                 songName = songName.replaceAll("\\s+", "+");
                 new FetchDataTask().execute(songName);
+            }
+        });
+
+        searchSpec.addOnButtonCheckedListener((materialButtonToggleGroup, checkedID, isChecked) -> {
+            if (isChecked) {
+                if (checkedID == R.id.songSearch) {
+                    searchSpecifier = "/songs";
+                    songBtn.setIconTintResource(R.color.red);
+                    albumBtn.setIconTintResource(R.color.teal);
+                    artistBtn.setIconTintResource(R.color.teal);
+                    playlistBtn.setIconTintResource(R.color.teal);
+                } else if (checkedID == R.id.albumSearch) {
+                    searchSpecifier = "/albums";
+                    albumBtn.setIconTintResource(R.color.red);
+                    songBtn.setIconTintResource(R.color.teal);
+                    artistBtn.setIconTintResource(R.color.teal);
+                    playlistBtn.setIconTintResource(R.color.teal);
+                } else if (checkedID == R.id.artistSearch) {
+                    searchSpecifier = "/artists";
+                    artistBtn.setIconTintResource(R.color.red);
+                    songBtn.setIconTintResource(R.color.teal);
+                    albumBtn.setIconTintResource(R.color.teal);
+                    playlistBtn.setIconTintResource(R.color.teal);
+                } else if (checkedID == R.id.playlistSearch) {
+                    searchSpecifier = "/playlists";
+                    playlistBtn.setIconTintResource(R.color.red);
+                    songBtn.setIconTintResource(R.color.teal);
+                    albumBtn.setIconTintResource(R.color.teal);
+                    artistBtn.setIconTintResource(R.color.teal);
+                }
+            } else {
+                searchSpecifier = "";
+                songBtn.setIconTintResource(R.color.teal);
+                albumBtn.setIconTintResource(R.color.teal);
+                artistBtn.setIconTintResource(R.color.teal);
+                playlistBtn.setIconTintResource(R.color.teal);
             }
         });
 
@@ -82,10 +137,10 @@ public class searchFragment extends Fragment {
         @Override
         protected List<songUnit> doInBackground(String... params) {
             String searchName = params[0];
-            List<songUnit> songUnits = new ArrayList<>();
-            //List<songUnit> nonSongs = new ArrayList<>();
+            //List<songUnit> songUnits = new ArrayList<>();
+            songUnits = new ArrayList<>();
             try {
-                URL url = new URL("https://saavn.dev/api/search?query=" + searchName);
+                URL url = new URL("https://saavn.dev/api/search"+ searchSpecifier +"?query=" + searchName);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
 
@@ -100,182 +155,47 @@ public class searchFragment extends Fragment {
                 JSONObject json = new JSONObject(response.toString());
                 JSONObject jsonObject = json.getJSONObject("data");
 
-                JSONArray topQuery = jsonObject.getJSONObject("topQuery").getJSONArray("results");
-                JSONArray albums = jsonObject.getJSONObject("albums").getJSONArray("results");
-                JSONArray artists = jsonObject.getJSONObject("artists").getJSONArray("results");
-                JSONArray playlists = jsonObject.getJSONObject("playlists").getJSONArray("results");
-                JSONArray songs = jsonObject.getJSONObject("songs").getJSONArray("results");
+                List<JSONArray> result = new ArrayList<>();
+                result.add(jsonObject.getJSONObject("topQuery").getJSONArray("results"));
+                result.add(jsonObject.getJSONObject("albums").getJSONArray("results"));
+                result.add(jsonObject.getJSONObject("artists").getJSONArray("results"));
+                result.add(jsonObject.getJSONObject("playlists").getJSONArray("results"));
+                result.add(jsonObject.getJSONObject("songs").getJSONArray("results"));
 
-                /*JSONObject topObject = jsonObject.getJSONObject("topQuery").getJSONObject("results");
-                JSONObject albumObject = jsonObject.getJSONObject("albums").getJSONObject("results");
-                JSONObject artistObject = jsonObject.getJSONObject("artists").getJSONObject("results");
-                JSONObject playlistObject = jsonObject.getJSONObject("playlists").getJSONObject("results");
-                JSONObject songObject = jsonObject.getJSONObject("songs").getJSONObject("results");*/
+                for (JSONArray array : result) {
+                    for (int i = 0; i < array.length(); ++i) {
+                        JSONObject itemObj = array.getJSONObject(i);
+                        String id = itemObj.getString("id");
+                        String type = itemObj.getString("type");
+                        String title = itemObj.getString("title");
+                        String image = itemObj.getJSONArray("image").getJSONObject(2).getString("url");
+                        String album = null;
+                        String itemUrl = null;
+                        String singers = null;
+                        String language = null;
+                        String songIDs = null;
 
-                for (int i = 0; i < topQuery.length(); ++i) {
-                    JSONObject itemObj = topQuery.getJSONObject(i);
-                    String id = itemObj.getString("id");
-                    String type = itemObj.getString("type");
-                    String title = itemObj.getString("title");
-                    String image = itemObj.getJSONArray("image").getJSONObject(2).getString("url");
-                    String album = null;
-                    String itemUrl = null;
-                    String singers = null;
-                    String language = null;
-                    String songIDs = null;
+                        switch (type){
+                            case "song":
+                                album = itemObj.getString("album");
+                                singers = itemObj.getString("singers");
+                                language = itemObj.getString("language");
+                                break;
 
-                    switch (type){
-                        case "song":
-                            album = itemObj.getString("album");
-                            singers = itemObj.getString("singers");
-                            language = itemObj.getString("language");
-                            break;
+                            case "album":
+                                singers = itemObj.getString("artist");
+                                language = itemObj.getString("language");
+                                itemUrl = itemObj.getString("url");
+                                songIDs = itemObj.getString("songIds");
+                                break;
 
-                        case "album":
-                            singers = itemObj.getString("artist");
-                            language = itemObj.getString("language");
-                            itemUrl = itemObj.getString("url");
-                            songIDs = itemObj.getString("songIds");
-                            break;
-
-                        case "playlist":
-                            language = itemObj.getString("language");
-                            itemUrl = itemObj.getString("url");
-                            break;
+                            case "playlist":
+                                language = itemObj.getString("language");
+                                itemUrl = itemObj.getString("url");
+                                break;
+                        }
+                        songUnits.add(new songUnit(id, title, image, album, itemUrl, type, singers, language, songIDs));
                     }
-                    songUnits.add(new songUnit(id, title, image, album, itemUrl, type, singers, language, songIDs));
-                }
-
-                for (int i = 0; i < albums.length(); ++i) {
-                    JSONObject itemObj = albums.getJSONObject(i);
-                    String id = itemObj.getString("id");
-                    String type = itemObj.getString("type");
-                    String title = itemObj.getString("title");
-                    String image = itemObj.getJSONArray("image").getJSONObject(2).getString("url");
-                    String album = null;
-                    String itemUrl = null;
-                    String singers = null;
-                    String language = null;
-                    String songIDs = null;
-                    switch (type){
-                        case "song":
-                            album = itemObj.getString("album");
-                            singers = itemObj.getString("singers");
-                            language = itemObj.getString("language");
-                            break;
-
-                        case "album":
-                            singers = itemObj.getString("artist");
-                            language = itemObj.getString("language");
-                            itemUrl = itemObj.getString("url");
-                            songIDs = itemObj.getString("songIds");
-                            break;
-
-                        case "playlist":
-                            language = itemObj.getString("language");
-                            itemUrl = itemObj.getString("url");
-                            break;
-                    }
-                    songUnits.add(new songUnit(id, title, image, album, itemUrl, type, singers, language, songIDs));
-                }
-
-                for (int i = 0; i < artists.length(); ++i) {
-                    JSONObject itemObj = artists.getJSONObject(i);
-                    String id = itemObj.getString("id");
-                    String type = itemObj.getString("type");
-                    String title = itemObj.getString("title");
-                    String image = itemObj.getJSONArray("image").getJSONObject(2).getString("url");
-                    String album = null;
-                    String itemUrl = null;
-                    String singers = null;
-                    String language = null;
-                    String songIDs = null;
-                    switch (type){
-                        case "song":
-                            album = itemObj.getString("album");
-                            singers = itemObj.getString("singers");
-                            language = itemObj.getString("language");
-                            break;
-
-                        case "album":
-                            singers = itemObj.getString("artist");
-                            language = itemObj.getString("language");
-                            itemUrl = itemObj.getString("url");
-                            songIDs = itemObj.getString("songIds");
-                            break;
-
-                        case "playlist":
-                            language = itemObj.getString("language");
-                            itemUrl = itemObj.getString("url");
-                            break;
-                    }
-                    songUnits.add(new songUnit(id, title, image, album, itemUrl, type, singers, language, songIDs));
-                }
-
-                for (int i = 0; i < playlists.length(); ++i) {
-                    JSONObject itemObj = playlists.getJSONObject(i);
-                    String id = itemObj.getString("id");
-                    String type = itemObj.getString("type");
-                    String title = itemObj.getString("title");
-                    String image = itemObj.getJSONArray("image").getJSONObject(2).getString("url");
-                    String album = null;
-                    String itemUrl = null;
-                    String singers = null;
-                    String language = null;
-                    String songIDs = null;
-                    switch (type){
-                        case "song":
-                            album = itemObj.getString("album");
-                            singers = itemObj.getString("singers");
-                            language = itemObj.getString("language");
-                            break;
-
-                        case "album":
-                            singers = itemObj.getString("artist");
-                            language = itemObj.getString("language");
-                            itemUrl = itemObj.getString("url");
-                            songIDs = itemObj.getString("songIds");
-                            break;
-
-                        case "playlist":
-                            language = itemObj.getString("language");
-                            itemUrl = itemObj.getString("url");
-                            break;
-                    }
-                    songUnits.add(new songUnit(id, title, image, album, itemUrl, type, singers, language, songIDs));
-                }
-
-                for (int i = 0; i < songs.length(); ++i) {
-                    JSONObject itemObj = songs.getJSONObject(i);
-                    String id = itemObj.getString("id");
-                    String type = itemObj.getString("type");
-                    String title = itemObj.getString("title");
-                    String image = itemObj.getJSONArray("image").getJSONObject(2).getString("url");
-                    String album = null;
-                    String itemUrl = null;
-                    String singers = null;
-                    String language = null;
-                    String songIDs = null;
-                    switch (type){
-                        case "song":
-                            album = itemObj.getString("album");
-                            singers = itemObj.getString("singers");
-                            language = itemObj.getString("language");
-                            break;
-
-                        case "album":
-                            singers = itemObj.getString("artist");
-                            language = itemObj.getString("language");
-                            itemUrl = itemObj.getString("url");
-                            songIDs = itemObj.getString("songIds");
-                            break;
-
-                        case "playlist":
-                            language = itemObj.getString("language");
-                            itemUrl = itemObj.getString("url");
-                            break;
-                    }
-                    songUnits.add(new songUnit(id, title, image, album, itemUrl, type, singers, language, songIDs));
                 }
 
                 connection.disconnect();

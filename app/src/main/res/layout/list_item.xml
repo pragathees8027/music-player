@@ -7,7 +7,10 @@
     app:cardCornerRadius="10dp"
     android:backgroundTint="@color/glass_teal"
     android:padding="8dp"
-    android:layout_margin="5dp">
+    android:layout_marginTop="5sp"
+    android:layout_marginBottom="5sp"
+    android:layout_marginStart="10sp"
+    android:layout_marginEnd="15sp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -53,9 +56,10 @@
                 android:layout_columnSpan="4"
                 android:layout_columnWeight="1"
                 android:layout_rowWeight="1"
-                android:layout_marginBottom="2sp"
+                android:layout_marginBottom="-2sp"
                 android:gravity="center_vertical"
                 android:text="Song Name"
+                android:fontFamily="@font/poppins"
                 android:textColor="@android:color/black"
                 android:textSize="20sp" />
 

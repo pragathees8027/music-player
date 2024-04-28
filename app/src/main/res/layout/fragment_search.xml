@@ -25,11 +25,14 @@
 
         <EditText
             android:id="@+id/search_input"
-            android:layout_width="280sp"
+            android:layout_width="match_parent"
             android:layout_height="80sp"
+            android:layout_marginEnd="110sp"
+            android:layout_marginStart="25sp"
             android:layout_gravity="center"
             android:textSize="20sp"
-            android:hint="Enter song name"
+            android:hint="Enter query to search"
+            android:fontFamily="@font/poppins"
             android:textAlignment="center"
             android:textColorHint="@color/glass_teal"
             android:textCursorDrawable="@null"
@@ -46,7 +49,7 @@
             android:layout_height="80sp"
             android:layout_marginTop="12dp"
             android:layout_marginEnd="16dp"
-            android:backgroundTint="@color/blue"
+            android:backgroundTint="@color/glass_blue"
             app:icon="@drawable/ic_search_black_24dp"
             app:iconGravity="textStart"
             app:iconPadding="0dp"
@@ -56,12 +59,63 @@
             app:layout_constraintTop_toBottomOf="@+id/home">
         </com.google.android.material.button.MaterialButton>
 
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/search_specifier"
+                android:layout_width="match_parent"
+                android:layout_height="80sp"
+                app:singleSelection="true"
+                android:gravity="center"
+                android:backgroundTint="@color/light_grey"
+                app:layout_constraintBottom_toTopOf="@+id/song_recycle_view"
+                app:layout_constraintTop_toBottomOf="@+id/search_input">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/songSearch"
+                    android:layout_width="80sp"
+                    android:layout_height="match_parent"
+                    app:icon="@drawable/music_note_24px"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="30sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/albumSearch"
+                    android:layout_width="80sp"
+                    android:layout_height="match_parent"
+
+                    app:icon="@drawable/album_24px"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="30sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/artistSearch"
+                    android:layout_width="80sp"
+                    android:layout_height="match_parent"
+                    app:icon="@drawable/person_24px"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="30sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/playlistSearch"
+                    android:layout_width="80sp"
+                    android:layout_height="match_parent"
+                    app:icon="@drawable/playlist_play_24px"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="30sp" />
+
+
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/song_recycle_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollbars="none"
-            android:layout_marginTop="150sp"
+            android:layout_marginTop="245sp"
             android:paddingStart="5sp"
             android:paddingEnd="5sp"
             app:layout_constraintEnd_toEndOf="parent"

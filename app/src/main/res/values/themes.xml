@@ -8,6 +8,8 @@
         <item name="colorSecondary">@color/white</item>
         <item name="colorSecondaryVariant">@color/white</item>
         <item name="colorOnSecondary">@color/teal</item>
+        <item name="android:statusBarColor">@color/glass</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 
     <style name="Theme.Music8027" parent="Base.Theme.Music8027" />

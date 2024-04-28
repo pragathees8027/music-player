@@ -309,14 +309,17 @@ public class settingsFragment extends Fragment {
         buttonClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (curSymbol != '0'){
+                if (curSymbol != '0' && inDisp.getText().length() == 0){
                     CharSequence curText = outDisp.getText();
-                    inDisp.setText(curText.subSequence(0,curText.length() - 1));
                     outDisp.setText(curText.subSequence(0,curText.length() - 1));
                     curSymbol = '0';
                 } else if (inDisp.getText().length()>0){
                     CharSequence curText = inDisp.getText();
                     inDisp.setText(curText.subSequence(0,curText.length() - 1));
+                    //outDisp.setText(curText.subSequence(0,curText.length() - 1));
+                } else if (outDisp.getText().length() > 0) {
+                    CharSequence curText = outDisp.getText();
+                    outDisp.setText(curText.subSequence(0,curText.length() - 1));
                 } else {
                     firstVal = Double.NaN;
                     secondVal = Double.NaN;
