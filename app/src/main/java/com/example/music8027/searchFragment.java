@@ -39,7 +39,8 @@ public class searchFragment extends Fragment {
     private static final String TAG = "searchFragment";
     private String songName = null;
     private String searchSpecifier = "";
-    private LottieAnimationView loadingAnimation;
+    private LottieAnimationView loadingAnimation, noResult;
+    private int checked = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -67,60 +68,89 @@ public class searchFragment extends Fragment {
         layoutManager = gridLayoutManager;
         mRecyclerView.setLayoutManager(layoutManager);
 
-        mAdapter = new RecyclerAdapter(getContext(), viewItems);
+        mAdapter = new RecyclerAdapter(getContext(), viewItems, searchSpecifier);
         mRecyclerView.setAdapter(mAdapter);
 
         MaterialButton search = view.findViewById(R.id.search_button);
         MaterialButtonToggleGroup searchSpec = view.findViewById(R.id.search_specifier);
+        MaterialButton topBtn = view.findViewById(R.id.topSearch);
         MaterialButton songBtn = view.findViewById(R.id.songSearch);
         MaterialButton albumBtn = view.findViewById(R.id.albumSearch);
         MaterialButton artistBtn = view.findViewById(R.id.artistSearch);
         MaterialButton playlistBtn = view.findViewById(R.id.playlistSearch);
         searchSong = view.findViewById(R.id.search_input);
         loadingAnimation = view.findViewById(R.id.loading_animation);
+        noResult = view.findViewById(R.id.no_result_animation);
 
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                songName = searchSong.getText().toString();
-                songName = songName.replaceAll("\\s+", "+");
-                new FetchDataTask().execute(songName);
+                triggerSearch();
             }
         });
 
-        searchSpec.addOnButtonCheckedListener((materialButtonToggleGroup, checkedID, isChecked) -> {
-            if (isChecked) {
-                if (checkedID == R.id.songSearch) {
-                    searchSpecifier = "/songs";
-                    songBtn.setIconTintResource(R.color.red);
-                    albumBtn.setIconTintResource(R.color.teal);
-                    artistBtn.setIconTintResource(R.color.teal);
-                    playlistBtn.setIconTintResource(R.color.teal);
-                } else if (checkedID == R.id.albumSearch) {
-                    searchSpecifier = "/albums";
-                    albumBtn.setIconTintResource(R.color.red);
-                    songBtn.setIconTintResource(R.color.teal);
-                    artistBtn.setIconTintResource(R.color.teal);
-                    playlistBtn.setIconTintResource(R.color.teal);
-                } else if (checkedID == R.id.artistSearch) {
-                    searchSpecifier = "/artists";
-                    artistBtn.setIconTintResource(R.color.red);
-                    songBtn.setIconTintResource(R.color.teal);
-                    albumBtn.setIconTintResource(R.color.teal);
-                    playlistBtn.setIconTintResource(R.color.teal);
-                } else if (checkedID == R.id.playlistSearch) {
-                    searchSpecifier = "/playlists";
-                    playlistBtn.setIconTintResource(R.color.red);
-                    songBtn.setIconTintResource(R.color.teal);
-                    albumBtn.setIconTintResource(R.color.teal);
-                    artistBtn.setIconTintResource(R.color.teal);
-                }
-            } else {
+        topBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 searchSpecifier = "";
+                topBtn.setIconTintResource(R.color.red);
                 songBtn.setIconTintResource(R.color.teal);
                 albumBtn.setIconTintResource(R.color.teal);
                 artistBtn.setIconTintResource(R.color.teal);
                 playlistBtn.setIconTintResource(R.color.teal);
+                triggerSearch();
+            }
+        });
+
+        songBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchSpecifier = "/songs";
+                topBtn.setIconTintResource(R.color.teal);
+                songBtn.setIconTintResource(R.color.red);
+                albumBtn.setIconTintResource(R.color.teal);
+                artistBtn.setIconTintResource(R.color.teal);
+                playlistBtn.setIconTintResource(R.color.teal);
+                triggerSearch();
+            }
+        });
+
+        albumBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchSpecifier = "/albums";
+                topBtn.setIconTintResource(R.color.teal);
+                songBtn.setIconTintResource(R.color.teal);
+                albumBtn.setIconTintResource(R.color.red);
+                artistBtn.setIconTintResource(R.color.teal);
+                playlistBtn.setIconTintResource(R.color.teal);
+                triggerSearch();
+            }
+        });
+
+        artistBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchSpecifier = "/artists";
+                topBtn.setIconTintResource(R.color.teal);
+                songBtn.setIconTintResource(R.color.teal);
+                albumBtn.setIconTintResource(R.color.teal);
+                artistBtn.setIconTintResource(R.color.red);
+                playlistBtn.setIconTintResource(R.color.teal);
+                triggerSearch();
+            }
+        });
+
+        playlistBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchSpecifier = "/playlists";
+                topBtn.setIconTintResource(R.color.teal);
+                songBtn.setIconTintResource(R.color.teal);
+                albumBtn.setIconTintResource(R.color.teal);
+                artistBtn.setIconTintResource(R.color.teal);
+                playlistBtn.setIconTintResource(R.color.red);
+                triggerSearch();
             }
         });
 
@@ -131,8 +161,9 @@ public class searchFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            loadingAnimation.setVisibility(View.VISIBLE);
+            noResult.setVisibility(View.GONE);
             mRecyclerView.setVisibility(View.GONE);
+            loadingAnimation.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -156,11 +187,14 @@ public class searchFragment extends Fragment {
                 JSONObject jsonObject = json.getJSONObject("data");
 
                 List<JSONArray> result = new ArrayList<>();
-                result.add(jsonObject.getJSONObject("topQuery").getJSONArray("results"));
-                result.add(jsonObject.getJSONObject("albums").getJSONArray("results"));
-                result.add(jsonObject.getJSONObject("artists").getJSONArray("results"));
-                result.add(jsonObject.getJSONObject("playlists").getJSONArray("results"));
-                result.add(jsonObject.getJSONObject("songs").getJSONArray("results"));
+                if (searchSpecifier.equals("")) {
+                    result.add(jsonObject.getJSONObject("topQuery").getJSONArray("results"));
+                    result.add(jsonObject.getJSONObject("albums").getJSONArray("results"));
+                    result.add(jsonObject.getJSONObject("artists").getJSONArray("results"));
+                    result.add(jsonObject.getJSONObject("playlists").getJSONArray("results"));
+                    result.add(jsonObject.getJSONObject("songs").getJSONArray("results"));
+                } else
+                    result.add(jsonObject.getJSONArray("results"));
 
                 for (JSONArray array : result) {
                     for (int i = 0; i < array.length(); ++i) {
@@ -181,7 +215,16 @@ public class searchFragment extends Fragment {
             viewItems.addAll(searchResult);
             mAdapter.notifyDataSetChanged();
             loadingAnimation.setVisibility(View.GONE);
-            mRecyclerView.setVisibility(View.VISIBLE);
+            if (searchResult.isEmpty())
+                noResult.setVisibility(View.VISIBLE);
+            else
+                mRecyclerView.setVisibility(View.VISIBLE);
         }
+    }
+
+    public void triggerSearch() {
+        songName = searchSong.getText().toString();
+        songName = songName.replaceAll("\\s+", "+");
+        new FetchDataTask().execute(songName);
     }
 }

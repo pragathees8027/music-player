@@ -65,9 +65,20 @@
                 android:layout_height="80sp"
                 app:singleSelection="true"
                 android:gravity="center"
+                app:selectionRequired="true"
                 android:backgroundTint="@color/light_grey"
                 app:layout_constraintBottom_toTopOf="@+id/song_recycle_view"
                 app:layout_constraintTop_toBottomOf="@+id/search_input">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/topSearch"
+                    android:layout_width="80sp"
+                    android:layout_height="match_parent"
+                    app:icon="@drawable/trending_up_24px"
+                    app:iconTint="@color/red"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="30sp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/songSearch"
@@ -82,7 +93,6 @@
                     android:id="@+id/albumSearch"
                     android:layout_width="80sp"
                     android:layout_height="match_parent"
-
                     app:icon="@drawable/album_24px"
                     app:iconGravity="textStart"
                     app:iconPadding="0dp"
@@ -106,12 +116,11 @@
                     app:iconPadding="0dp"
                     app:iconSize="30sp" />
 
-
             </com.google.android.material.button.MaterialButtonToggleGroup>
-
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/song_recycle_view"
+            android:visibility="visible"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollbars="none"
@@ -128,18 +137,33 @@
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/loading_animation"
-            android:layout_width="145dp"
-            android:layout_height="158dp"
+            android:layout_width="103dp"
+            android:layout_height="111dp"
             android:layout_centerInParent="true"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:visibility="gone"
+            android:layout_marginTop="420sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.55"
             app:lottie_autoPlay="true"
-            android:visibility="gone"
             app:lottie_loop="true"
             app:lottie_rawRes="@raw/lottie_4_diamond_loading" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/no_result_animation"
+            android:layout_width="176dp"
+            android:layout_height="180dp"
+            android:layout_centerInParent="true"
+            android:visibility="gone"
+            android:layout_marginTop="380sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.573"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="false"
+            app:lottie_rawRes="@raw/no_result" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
