@@ -16,6 +16,7 @@ import com.example.music8027.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding mainBinding;
     private String[] permissions = new String[7];
+    private int i= 0;
     private long mBackPressed;
 
     @Override
@@ -25,17 +26,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(mainBinding.getRoot());
         replaceFragment(new homeFragment());
 
-        permissions[0] = Manifest.permission.READ_EXTERNAL_STORAGE;
-        permissions[1] = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+        permissions[i++] = Manifest.permission.READ_EXTERNAL_STORAGE;
+        permissions[i++] = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+        permissions[i++] = Manifest.permission.INTERNET;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissions[2] = Manifest.permission.POST_NOTIFICATIONS;
-            permissions[3] = Manifest.permission.READ_MEDIA_AUDIO;
-            permissions[4] = Manifest.permission.READ_MEDIA_IMAGES;
+            permissions[i++] = Manifest.permission.POST_NOTIFICATIONS;
+            permissions[i++] = Manifest.permission.READ_MEDIA_AUDIO;
+            permissions[i++] = Manifest.permission.READ_MEDIA_IMAGES;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                permissions[5] = Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED;
+                permissions[i++] = Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED;
             }
         }
-        permissions[6] = Manifest.permission.INTERNET;
 
         requestPermissions();
 
@@ -86,7 +87,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void requestPermissions() {
         boolean req = false;
-        for (String s : permissions) {
+        String[] getPermissions= new String[i];
+        for (int j = 0; j < i; j++)
+            getPermissions[j] = permissions[j];
+        for (String s : getPermissions) {
             if (ActivityCompat.checkSelfPermission(MainActivity.this, s)
                     != PackageManager.PERMISSION_GRANTED && ActivityCompat.
                     checkSelfPermission(MainActivity.this, s)
@@ -95,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         if (req) {
-            ActivityCompat.requestPermissions(MainActivity.this, permissions, 1);
+            ActivityCompat.requestPermissions(MainActivity.this, getPermissions, 1);
         }
     }
 
