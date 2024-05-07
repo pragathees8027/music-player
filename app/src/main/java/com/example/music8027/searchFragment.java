@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -40,7 +41,6 @@ public class searchFragment extends Fragment {
     private String songName = null;
     private String searchSpecifier = "";
     private LottieAnimationView loadingAnimation, noResult;
-    private int checked = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

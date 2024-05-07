@@ -11,4 +11,5 @@
     <color name="glass">#00000000</color>
     <color name="grey">#636161</color>
     <color name="light_grey">#BCC1CD</color>
+    <color name="tick_green">#119f55</color>
 </resources>

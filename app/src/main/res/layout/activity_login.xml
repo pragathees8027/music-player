@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity">
+
+    <TextView
+        android:id="@+id/header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/poppins"
+        android:text="Login to Music8027"
+        android:textSize="30sp"
+        android:layout_marginTop="120sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="100sp"
+        android:layout_height="100sp"
+        android:src="@drawable/passkey_24px"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        android:layout_marginTop="40sp"
+        app:tint="@color/blue"/>
+
+    <ImageView
+        android:id="@+id/emailIcon"
+        android:layout_width="25sp"
+        android:layout_height="25sp"
+        android:layout_marginEnd="10sp"
+        android:src="@drawable/alternate_email_24px"
+        app:layout_constraintBottom_toBottomOf="@+id/email"
+        app:layout_constraintEnd_toStartOf="@+id/email"
+        app:layout_constraintTop_toTopOf="@+id/email"
+        app:tint="@color/light_grey" />
+
+    <EditText
+        android:id="@+id/email"
+        android:layout_width="250sp"
+        android:layout_height="60sp"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="30sp"
+        android:hint="email"
+        android:padding="10sp"
+        android:textAlignment="center"
+        android:textCursorDrawable="@null"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+    <ImageView
+        android:id="@+id/passwordIcon"
+        android:layout_width="25sp"
+        android:layout_height="25sp"
+        android:layout_marginEnd="10sp"
+        android:src="@drawable/password_24px"
+        app:layout_constraintBottom_toBottomOf="@+id/password"
+        app:layout_constraintEnd_toStartOf="@+id/password"
+        app:layout_constraintTop_toTopOf="@+id/password"
+        app:tint="@color/light_grey" />
+
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="250sp"
+        android:layout_height="60sp"
+        android:layout_marginTop="8dp"
+        android:hint="password"
+        android:padding="10sp"
+        android:layout_marginStart="30sp"
+        android:textAlignment="center"
+        android:textCursorDrawable="@null"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/email" />
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/loginToggleGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@+id/password">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/signUpButton"
+            android:layout_width="140sp"
+            android:layout_height="60sp"
+            android:backgroundTint="@color/glass_teal"
+            android:text="Sing Up"
+            app:icon="@drawable/add_circle_24px"
+            app:iconTint="@color/white"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/loginButton"
+            android:layout_width="140sp"
+            android:layout_height="60sp"
+            android:backgroundTint="@color/glass_teal"
+            android:text="Login"
+            app:icon="@drawable/login_24px"
+            app:iconTint="@color/white"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <TextView
+        android:id="@+id/forgotPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Forgot password?"
+        android:textSize="20sp"
+        android:layout_marginTop="20sp"
+        android:textColor="@color/red"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:clickable="true"
+        app:layout_constraintTop_toBottomOf="@+id/loginToggleGroup" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/login_animation"
+        android:layout_width="80sp"
+        android:layout_height="80sp"
+        android:layout_marginTop="120sp"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/password"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/lottie_4_diamond_loading" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

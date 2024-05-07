@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "384369594994",
+    "project_id": "music8027-e0cc2",
+    "storage_bucket": "music8027-e0cc2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:384369594994:android:cb46c914bff6e36de528eb",
+        "android_client_info": {
+          "package_name": "com.example.music8027"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjRT_R8bbMoSou4zqaYKAXoTIuKbpQzcM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

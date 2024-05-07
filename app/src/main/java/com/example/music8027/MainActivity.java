@@ -1,7 +1,10 @@
 package com.example.music8027;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -15,9 +18,10 @@ import com.example.music8027.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding mainBinding;
-    private String[] permissions = new String[7];
+    private String[] permissions = new String[8];
     private int i= 0;
     private long mBackPressed;
+    private Toast toast = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         permissions[i++] = Manifest.permission.READ_EXTERNAL_STORAGE;
         permissions[i++] = Manifest.permission.WRITE_EXTERNAL_STORAGE;
         permissions[i++] = Manifest.permission.INTERNET;
+        permissions[i++] = Manifest.permission.ACCESS_NETWORK_STATE;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             permissions[i++] = Manifest.permission.POST_NOTIFICATIONS;
             permissions[i++] = Manifest.permission.READ_MEDIA_AUDIO;
@@ -39,6 +44,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         requestPermissions();
+
+        if (!isNetworkAvailable(getApplicationContext())) {
+            if (toast != null)
+                toast.cancel();
+            toast = Toast.makeText(MainActivity.this, "No internet",
+                    Toast.LENGTH_SHORT);
+            toast.show();
+        }
 
         mainBinding.mainBar.setOnItemSelectedListener(menuItem -> {
             Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.mainFrame);
@@ -125,5 +138,14 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
         mBackPressed = System.currentTimeMillis();
+    }
+
+    public static boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+            return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+        }
+        return false;
     }
 }
