@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/login_bg"
     tools:context=".LoginActivity">
 
     <TextView
@@ -12,6 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/poppins"
+        android:textColor="@color/white"
         android:text="Login to Music8027"
         android:textSize="30sp"
         android:layout_marginTop="120sp"
@@ -28,7 +30,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/header"
         android:layout_marginTop="40sp"
-        app:tint="@color/blue"/>
+        app:tint="@color/glass_red"/>
 
     <ImageView
         android:id="@+id/emailIcon"
@@ -39,7 +41,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/email"
         app:layout_constraintEnd_toStartOf="@+id/email"
         app:layout_constraintTop_toTopOf="@+id/email"
-        app:tint="@color/light_grey" />
+        app:tint="@color/red" />
 
     <EditText
         android:id="@+id/email"
@@ -48,6 +50,8 @@
         android:layout_marginTop="8dp"
         android:layout_marginStart="30sp"
         android:hint="email"
+        android:textColorHint="@color/white"
+        android:textColor="@color/white"
         android:padding="10sp"
         android:textAlignment="center"
         android:textCursorDrawable="@null"
@@ -64,7 +68,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/password"
         app:layout_constraintEnd_toStartOf="@+id/password"
         app:layout_constraintTop_toTopOf="@+id/password"
-        app:tint="@color/light_grey" />
+        app:tint="@color/red" />
 
     <EditText
         android:id="@+id/password"
@@ -73,6 +77,8 @@
         android:layout_marginTop="8dp"
         android:hint="password"
         android:padding="10sp"
+        android:textColorHint="@color/white"
+        android:textColor="@color/white"
         android:layout_marginStart="30sp"
         android:textAlignment="center"
         android:textCursorDrawable="@null"
@@ -97,7 +103,7 @@
             android:backgroundTint="@color/glass_teal"
             android:text="Sing Up"
             app:icon="@drawable/add_circle_24px"
-            app:iconTint="@color/white"
+            app:iconTint="@color/glass_red"
             android:textColor="@color/black"
             android:textSize="15sp" />
 
@@ -108,7 +114,7 @@
             android:backgroundTint="@color/glass_teal"
             android:text="Login"
             app:icon="@drawable/login_24px"
-            app:iconTint="@color/white"
+            app:iconTint="@color/glass_red"
             android:textColor="@color/black"
             android:textSize="15sp" />
 
@@ -119,7 +125,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Forgot password?"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:layout_marginTop="20sp"
         android:textColor="@color/red"
         app:layout_constraintEnd_toEndOf="parent"

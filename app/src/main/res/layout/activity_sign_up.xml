@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/login_bg"
     tools:context=".LoginActivity">
 
     <TextView
@@ -13,6 +14,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/poppins"
         android:text="Create account"
+        android:textColor="@color/white"
         android:textSize="30sp"
         android:layout_marginTop="120sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -46,10 +48,12 @@
         android:id="@+id/userName"
         android:layout_width="250sp"
         android:layout_height="60sp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="60dp"
         android:layout_marginStart="30sp"
         android:hint="name"
         android:padding="10sp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
         android:textAlignment="center"
         android:textCursorDrawable="@null"
         app:layout_constraintEnd_toEndOf="parent"
@@ -63,6 +67,8 @@
         android:layout_marginTop="8dp"
         android:layout_marginStart="30sp"
         android:hint="email"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
         android:padding="10sp"
         android:textAlignment="center"
         android:textCursorDrawable="@null"
@@ -99,6 +105,8 @@
         android:layout_marginTop="8dp"
         android:hint="password"
         android:padding="10sp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
         android:layout_marginStart="30sp"
         android:textAlignment="center"
         android:textCursorDrawable="@null"
@@ -112,6 +120,8 @@
         android:layout_height="60sp"
         android:layout_marginTop="8dp"
         android:hint="confirm password"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
         android:padding="10sp"
         android:layout_marginStart="30sp"
         android:textAlignment="center"
@@ -137,7 +147,7 @@
             android:backgroundTint="@color/glass_teal"
             android:text="Sing Up"
             app:icon="@drawable/add_circle_24px"
-            app:iconTint="@color/white"
+            app:iconTint="@color/glass_red"
             android:textColor="@color/black"
             android:textSize="15sp" />
 
@@ -148,7 +158,7 @@
             android:backgroundTint="@color/glass_teal"
             android:text="Login"
             app:icon="@drawable/login_24px"
-            app:iconTint="@color/white"
+            app:iconTint="@color/glass_red"
             android:textColor="@color/black"
             android:textSize="15sp" />
 
