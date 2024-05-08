@@ -9,7 +9,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="85sp">
+        android:layout_marginBottom="0sp">
 
         <TextView
             android:id="@+id/home"
