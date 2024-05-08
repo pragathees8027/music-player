@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -167,6 +168,7 @@ public class LoginActivity extends AppCompatActivity {
                                     Intent i = new Intent(LoginActivity.this, MainActivity.class);
                                     startActivity(i);
                                     overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                                    finish();
                                 } else {
                                     toast = Toast.makeText(LoginActivity.this, "Invalid credentials.",
                                             Toast.LENGTH_SHORT);

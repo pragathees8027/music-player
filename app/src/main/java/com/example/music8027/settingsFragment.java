@@ -58,7 +58,7 @@ public class settingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(requireContext(), LoginActivity.class);
+                Intent intent = new Intent(requireActivity(), LoginActivity.class);
                 startActivity(intent);
                 requireActivity().finish();
             }
