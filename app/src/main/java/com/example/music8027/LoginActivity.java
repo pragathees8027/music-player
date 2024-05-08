@@ -2,7 +2,6 @@ package com.example.music8027;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
@@ -63,7 +62,7 @@ public class LoginActivity extends AppCompatActivity {
 
         MaterialButtonToggleGroup toggleGroup = findViewById(R.id.loginToggleGroup);
         MaterialButton loginButton = findViewById(R.id.loginButton);
-        MaterialButton singUpButton = findViewById(R.id.signUpButton);
+        MaterialButton signUpButton = findViewById(R.id.signUpButton);
 
         email = findViewById(R.id.email);
         password = findViewById(R.id.password);
@@ -110,6 +109,15 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        signUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(LoginActivity.this, SignUpActivity.class);
+                startActivity(i);
+                overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+            }
+        });
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -150,40 +158,16 @@ public class LoginActivity extends AppCompatActivity {
                                     loadingAnimation.setVisibility(View.GONE);
                                     forgotPassword.setVisibility(View.VISIBLE);
                                     toggleGroup.setVisibility(View.VISIBLE);
-                                    Handler handler = new Handler();
-                                    handler.postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Handler handler1 = new Handler();
-                                            handler1.postDelayed(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    toast = Toast.makeText(LoginActivity.this, "Logged in successfully", Toast.LENGTH_SHORT);
-                                                    toast.show();
-                                                    Intent i = new Intent(LoginActivity.this, MainActivity.class);
-                                                    startActivity(i);
-                                                    overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
-                                                }
-                                            }, 1000);
-                                        }
-                                    }, 2000);
-                                } else {
-                                    Handler handler2 = new Handler();
-                                    handler2.postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Handler handler3 = new Handler();
-                                            handler3.postDelayed(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    toast = Toast.makeText(LoginActivity.this, "Invalid credentials.",
-                                                            Toast.LENGTH_SHORT);
-                                                    toast.show();
-                                                }
-                                            },1000);
 
-                                        }
-                                    },2000);
+                                    toast = Toast.makeText(LoginActivity.this, "Logged in successfully", Toast.LENGTH_SHORT);
+                                    toast.show();
+                                    Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                                    startActivity(i);
+                                    overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+                                } else {
+                                    toast = Toast.makeText(LoginActivity.this, "Invalid credentials.",
+                                            Toast.LENGTH_SHORT);
+                                    toast.show();
                                 }
                             }
                         });

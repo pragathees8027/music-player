@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/poppins"
-        android:text="User Profile"
+        android:text="Create account"
         android:textSize="30sp"
         android:layout_marginTop="120sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -131,43 +131,28 @@
         app:layout_constraintTop_toBottomOf="@+id/confirmPassword">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/updateButton"
+            android:id="@+id/signUpButton"
             android:layout_width="140sp"
             android:layout_height="60sp"
             android:backgroundTint="@color/glass_teal"
-            android:text="Update"
-            app:icon="@drawable/publish_24px"
+            android:text="Sing Up"
+            app:icon="@drawable/add_circle_24px"
             app:iconTint="@color/white"
             android:textColor="@color/black"
             android:textSize="15sp" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/logoutButton"
+            android:id="@+id/loginButton"
             android:layout_width="140sp"
             android:layout_height="60sp"
             android:backgroundTint="@color/glass_teal"
-            android:text="Log out"
-            app:icon="@drawable/exit_to_app_24px"
+            android:text="Login"
+            app:icon="@drawable/login_24px"
             app:iconTint="@color/white"
             android:textColor="@color/black"
             android:textSize="15sp" />
 
     </com.google.android.material.button.MaterialButtonToggleGroup>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/calculatorButton"
-        android:layout_width="180sp"
-        android:layout_height="60sp"
-        android:backgroundTint="@color/glass_teal"
-        android:text="Calculator"
-        android:textColor="@color/black"
-        android:textSize="15sp"
-        app:icon="@drawable/function_24px"
-        app:iconTint="@color/white"
-        android:layout_marginTop="50sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loginToggleGroup" />
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/login_animation"

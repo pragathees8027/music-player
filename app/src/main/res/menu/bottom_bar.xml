@@ -16,6 +16,6 @@
         android:title="Songs"
         android:icon="@drawable/music_note_24px" />
     <item android:id="@+id/bar_settings"
-        android:title="Calculator"
-        android:icon="@drawable/function_24px"/>
+        android:title="Settings"
+        android:icon="@drawable/settings_24px"/>
 </menu>
