@@ -2,6 +2,7 @@ package com.example.music8027;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
@@ -35,6 +36,8 @@ public class LoginActivity extends AppCompatActivity {
     private EditText email, password;
     private LottieAnimationView loadingAnimation;
     private Toast toast = null;
+    private Handler handler = new Handler();
+    private  Runnable runnable;
     @Override
     public void onStart() {
         super.onStart();
@@ -43,6 +46,7 @@ public class LoginActivity extends AppCompatActivity {
         if(currentUser != null){
             Intent i = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(i);
+            finish();
         }
     }
 
@@ -114,7 +118,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent i = new Intent(LoginActivity.this, SignUpActivity.class);
                 startActivity(i);
-                overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 
@@ -154,16 +158,15 @@ public class LoginActivity extends AppCompatActivity {
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
+                                loadingAnimation.setVisibility(View.GONE);
+                                forgotPassword.setVisibility(View.VISIBLE);
+                                toggleGroup.setVisibility(View.VISIBLE);
                                 if (task.isSuccessful()) {
-                                    loadingAnimation.setVisibility(View.GONE);
-                                    forgotPassword.setVisibility(View.VISIBLE);
-                                    toggleGroup.setVisibility(View.VISIBLE);
-
                                     toast = Toast.makeText(LoginActivity.this, "Logged in successfully", Toast.LENGTH_SHORT);
                                     toast.show();
                                     Intent i = new Intent(LoginActivity.this, MainActivity.class);
                                     startActivity(i);
-                                    overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+                                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                                 } else {
                                     toast = Toast.makeText(LoginActivity.this, "Invalid credentials.",
                                             Toast.LENGTH_SHORT);
@@ -189,5 +192,9 @@ public class LoginActivity extends AppCompatActivity {
             return activeNetworkInfo != null && activeNetworkInfo.isConnected();
         }
         return false;
+    }
+
+    protected void onDestroy(){
+        super.onDestroy();
     }
 }

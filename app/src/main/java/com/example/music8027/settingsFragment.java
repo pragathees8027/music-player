@@ -1,6 +1,5 @@
 package com.example.music8027;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,8 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
+
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.button.MaterialButton;
@@ -29,7 +27,6 @@ import java.util.Map;
 public class settingsFragment extends Fragment {
 
     private static final String TAG = "SignUpActivity";
-
     private EditText editTextName, editTextEmail, editTextPassword, editTextConfirmPassword;
     private FirebaseAuth mAuth;
     FirebaseUser currentUser;
@@ -70,12 +67,7 @@ public class settingsFragment extends Fragment {
         calcButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentManager fragmentManager = getParentFragmentManager();
-                FragmentTransaction transaction = fragmentManager.beginTransaction();
-                transaction.setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                        .replace(R.id.mainFrame, new calcFragment())
-                        .addToBackStack(null);
-                transaction.commit();
+                ((MainActivity)getActivity()).replaceFragment(new calcFragment());
             }
         });
 
@@ -164,6 +156,7 @@ public class settingsFragment extends Fragment {
                             String email = documentSnapshot.getString("email");
                             editTextName.setText(name);
                             editTextEmail.setText(email);
+                            Toast.makeText(getActivity(), "Fetched user data", Toast.LENGTH_SHORT).show();
                         } else {
                             Log.d(TAG, "No such document");
                             Toast.makeText(getActivity(), "Error fetching user data, No such document", Toast.LENGTH_SHORT).show();
@@ -174,7 +167,7 @@ public class settingsFragment extends Fragment {
                         Toast.makeText(getActivity(), "Error fetching user data", Toast.LENGTH_SHORT).show();
                     });
         } else {
-            Toast.makeText(getActivity(), "User details updated", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Not logged in", Toast.LENGTH_SHORT).show();
             Log.d(TAG, "No user logged in");
         }
     }

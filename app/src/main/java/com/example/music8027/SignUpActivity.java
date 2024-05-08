@@ -103,6 +103,7 @@ public class SignUpActivity extends AppCompatActivity {
                             Intent i = new Intent(SignUpActivity.this, LoginActivity.class);
                             startActivity(i);
                             overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+                            finish();
                         } else {
                             Toast.makeText(SignUpActivity.this, "Authentication failed. Try again", Toast.LENGTH_SHORT).show();
                         }

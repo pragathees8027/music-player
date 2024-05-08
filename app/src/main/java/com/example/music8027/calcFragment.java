@@ -29,7 +29,7 @@ public class calcFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_settings, container, false);
+        view = inflater.inflate(R.layout.fragment_calc, container, false);
 
         decForm = new DecimalFormat("#.#####");
         inDisp = view.findViewById(R.id.input);
