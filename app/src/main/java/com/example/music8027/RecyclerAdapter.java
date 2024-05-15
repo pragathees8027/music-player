@@ -30,24 +30,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemVi
     private final Context context;
     private final List<Object> listRecyclerItem;
     private String searchType;
-    private static OnItemClickListener mListener;
-    private static OnTaskStatusListener taskStatusListener;
-    public interface OnTaskStatusListener {
-        void onTaskStart();
-        void onTaskComplete();
-    }
-
-    public void setTaskStatusListener(OnTaskStatusListener listener) {
-        this.taskStatusListener = listener;
-    }
-
-    public interface OnItemClickListener {
-        void onItemClick(String apiUrl) throws ExecutionException, InterruptedException;
-    }
-
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        mListener = listener;
-    }
 
 
     public RecyclerAdapter(Context context, List<Object> listRecyclerItem, String searchType) {
@@ -134,41 +116,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemVi
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-
-        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                JSONObject item = (JSONObject) listRecyclerItem.get(i);
-                String id = null;
-                String type = null;
-                String searchSpec = null;
-                try {
-                    id = item.getString("id");
-                    type = item.getString("type");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                switch (type) {
-                    case "song":
-                        searchSpec = "songs/";
-                        break;
-
-                    case "album":
-                        searchSpec = "albums?id=";
-                        break;
-
-                    case "artist":
-                        searchSpec = "artists/";
-                        break;
-
-                    case "playlist":
-                        searchSpec = "playlists?id=";
-                        break;
-                }
-                String objectUrl = "https://saavn.dev/api/" + searchSpec + id;
-                new FetchSongDataTask().execute(objectUrl);
-            }
-        });
     }
 
     @Override
@@ -176,86 +123,4 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemVi
         return listRecyclerItem.size();
     }
 
-    public static class FetchSongDataTask extends AsyncTask<String, Void, JSONObject> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            if (taskStatusListener != null) {
-                taskStatusListener.onTaskStart();
-            }
-        }
-
-        @Override
-        protected JSONObject doInBackground(String... params) {
-            JSONObject songData = null;
-            try {
-                String objectUrlString = params[0];
-                URL objectUrl = new URL(objectUrlString);
-                HttpURLConnection connection = (HttpURLConnection) objectUrl.openConnection();
-                connection.setRequestMethod("GET");
-
-                StringBuilder response = new StringBuilder();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
-                }
-                reader.close();
-
-                songData = new JSONObject(response.toString());
-
-                connection.disconnect();
-            } catch (IOException | JSONException e) {
-                e.printStackTrace();
-            }
-            return songData;
-        }
-
-        /*@Override
-        protected JSONObject doInBackground(String... params) {
-            String objectUrlString = params[0];
-            return fetchSongData(objectUrlString);
-        }*/
-
-        @Override
-        protected void onPostExecute(JSONObject songData) {
-            if (taskStatusListener != null) {
-                taskStatusListener.onTaskComplete();
-            }
-            if (mListener != null) {
-                try {
-                    mListener.onItemClick(String.valueOf(songData));
-                } catch (ExecutionException e) {
-                    throw new RuntimeException(e);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-    }
-
-    /*private JSONObject fetchSongData(String objectUrlString) {
-        JSONObject songData = null;
-        try {
-            URL objectUrl = new URL(objectUrlString);
-            HttpURLConnection connection = (HttpURLConnection) objectUrl.openConnection();
-            connection.setRequestMethod("GET");
-
-            StringBuilder response = new StringBuilder();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
-            }
-            reader.close();
-
-            songData = new JSONObject(response.toString());
-
-            connection.disconnect();
-        } catch (IOException | JSONException e) {
-            e.printStackTrace();
-        }
-        return songData;
-    }*/
 }
