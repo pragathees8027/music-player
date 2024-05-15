@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -29,7 +28,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class searchFragment extends Fragment {
+public class searchFragment extends Fragment implements FetchDataTask.OnDataFetchedListener {
     private RecyclerView mRecyclerView;
     private List<Object> viewItems = new ArrayList<>();
     private ArrayList<JSONObject> searchResult;
@@ -41,6 +40,7 @@ public class searchFragment extends Fragment {
     private String songName = null;
     private String searchSpecifier = "";
     private LottieAnimationView loadingAnimation, noResult;
+    private ArrayList<JSONObject> songDetails;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -72,7 +72,7 @@ public class searchFragment extends Fragment {
         mRecyclerView.setAdapter(mAdapter);
 
         MaterialButton search = view.findViewById(R.id.search_button);
-        MaterialButtonToggleGroup searchSpec = view.findViewById(R.id.search_specifier);
+        //MaterialButtonToggleGroup searchSpec = view.findViewById(R.id.search_specifier);
         MaterialButton topBtn = view.findViewById(R.id.topSearch);
         MaterialButton songBtn = view.findViewById(R.id.songSearch);
         MaterialButton albumBtn = view.findViewById(R.id.albumSearch);
@@ -210,7 +210,7 @@ public class searchFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(ArrayList<JSONObject> songUnits) {
+        protected void onPostExecute(ArrayList<JSONObject> searchResult) {
             viewItems.clear();
             viewItems.addAll(searchResult);
             mAdapter.notifyDataSetChanged();
@@ -226,5 +226,12 @@ public class searchFragment extends Fragment {
         songName = searchSong.getText().toString();
         songName = songName.replaceAll("\\s+", "+");
         new FetchDataTask().execute(songName);
+    }
+
+    //@Override
+    public void onDataFetched(ArrayList<JSONObject> songData) {
+        // Process the fetched data and create a new songDetails JSONObject
+        songDetails = songData;
+        // Now you can use songDetails as needed
     }
 }

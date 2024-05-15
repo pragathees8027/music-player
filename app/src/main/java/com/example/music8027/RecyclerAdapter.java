@@ -1,6 +1,8 @@
 package com.example.music8027;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +17,27 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemViewHolder> {
+
     private final Context context;
     private final List<Object> listRecyclerItem;
     private String searchType;
+    private OnItemClickListener mListener;
+
+    public interface OnItemClickListener {
+        void onItemClick(String apiUrl);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mListener = listener;
+    }
 
     public RecyclerAdapter(Context context, List<Object> listRecyclerItem, String searchType) {
         this.context = context;
@@ -36,7 +53,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemVi
         JSONObject currentUnit = (JSONObject) listRecyclerItem.get(position);
         try {
             if (currentUnit.getString("type").equals("song"))
-                    return 1;
+                return 1;
             return 0;
         } catch (JSONException e) {
             throw new RuntimeException(e);
@@ -60,17 +77,18 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemVi
     @NonNull
     @Override
     public ItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int type) {
+        View layoutView;
         if (type == 1) {
-            View layoutView = LayoutInflater.from(viewGroup.getContext()).inflate(
+            layoutView = LayoutInflater.from(viewGroup.getContext()).inflate(
                     R.layout.list_item, viewGroup, false);
-            return new ItemViewHolder(layoutView);
+        } else {
+            layoutView = LayoutInflater.from(viewGroup.getContext()).inflate(
+                    R.layout.list_item_square, viewGroup, false);
         }
-
-        View layoutView = LayoutInflater.from(viewGroup.getContext()).inflate(
-                R.layout.list_item_square, viewGroup, false);
         return new ItemViewHolder(layoutView);
     }
 
+    @SuppressLint("RecyclerView")
     @Override
     public void onBindViewHolder(@NonNull ItemViewHolder viewHolder, int i) {
         JSONObject songUnit = (JSONObject) listRecyclerItem.get(i);
@@ -105,10 +123,67 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemVi
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
+
+        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                JSONObject item = (JSONObject) listRecyclerItem.get(i);
+                String id = null;
+                String type = null;
+                try {
+                    id = item.getString("id");
+                    type = item.getString("type");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                String objectUrl = "https://saavn.dev/api/" + type + "s/" + id;
+                new FetchSongDataTask().execute(objectUrl);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return listRecyclerItem.size();
+    }
+
+    private class FetchSongDataTask extends AsyncTask<String, Void, JSONObject> {
+        @Override
+        protected JSONObject doInBackground(String... params) {
+            String objectUrlString = params[0];
+            return fetchSongData(objectUrlString);
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject songData) {
+            if (mListener != null) {
+                mListener.onItemClick(String.valueOf(songData));
+            }
+        }
+    }
+
+    private JSONObject fetchSongData(String objectUrlString) {
+        JSONObject songData = null;
+        try {
+            URL objectUrl = new URL(objectUrlString);
+            HttpURLConnection connection = (HttpURLConnection) objectUrl.openConnection();
+            connection.setRequestMethod("GET");
+
+            StringBuilder response = new StringBuilder();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+            reader.close();
+
+            songData = new JSONObject(response.toString());
+
+            connection.disconnect();
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+        }
+        return songData;
     }
 }
