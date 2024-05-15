@@ -130,14 +130,31 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemVi
                 JSONObject item = (JSONObject) listRecyclerItem.get(i);
                 String id = null;
                 String type = null;
+                String searchSpec = null;
                 try {
                     id = item.getString("id");
                     type = item.getString("type");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                switch (type) {
+                    case "song":
+                        searchSpec = "songs/";
+                        break;
 
-                String objectUrl = "https://saavn.dev/api/" + type + "s/" + id;
+                    case "album":
+                        searchSpec = "albums?id=";
+                        break;
+
+                    case "artist":
+                        searchSpec = "artists/";
+                        break;
+
+                    case "playlist":
+                        searchSpec = "playlists?id=";
+                        break;
+                }
+                String objectUrl = "https://saavn.dev/api/" + searchSpec + id;
                 new FetchSongDataTask().execute(objectUrl);
             }
         });

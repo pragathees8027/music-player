@@ -20,3 +20,5 @@ app-debug.apk
 app-release.apk
 app/src/androidTest
 app/src/test
+.idea/deploymentTargetDropDown.xml
+
