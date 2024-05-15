@@ -2,7 +2,6 @@ package com.example.music8027;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
@@ -15,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.fragment.app.Fragment;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -37,8 +35,6 @@ public class LoginActivity extends AppCompatActivity {
     private EditText email, password;
     private LottieAnimationView loadingAnimation;
     private Toast toast = null;
-    private Handler handler = new Handler();
-    private  Runnable runnable;
     @Override
     public void onStart() {
         super.onStart();

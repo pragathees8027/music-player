@@ -32,6 +32,7 @@
             android:layout_gravity="center"
             android:textSize="20sp"
             android:hint="Enter query to search"
+            android:singleLine="true"
             android:fontFamily="@font/poppins"
             android:textAlignment="center"
             android:textColorHint="@color/glass_teal"
