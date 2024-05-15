@@ -2,6 +2,7 @@ package com.example.music8027;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -19,7 +20,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +35,7 @@ public class SignUpActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private LottieAnimationView loadingAnimation;
+    private MaterialButtonToggleGroup toggleGroup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +50,7 @@ public class SignUpActivity extends AppCompatActivity {
         editTextEmail = findViewById(R.id.email);
         editTextPassword = findViewById(R.id.password);
         editTextConfirmPassword = findViewById(R.id.confirmPassword);
-
-        MaterialButtonToggleGroup toggleGroup = findViewById(R.id.loginToggleGroup);
+        toggleGroup = findViewById(R.id.loginToggleGroup);
         MaterialButton signUpButton = findViewById(R.id.signUpButton);
         MaterialButton loginButton = findViewById(R.id.loginButton);
         loadingAnimation = findViewById(R.id.login_animation);
@@ -66,9 +69,7 @@ public class SignUpActivity extends AppCompatActivity {
             public void onClick(View v) {
                 toggleGroup.setVisibility(View.GONE);
                 loadingAnimation.setVisibility(View.VISIBLE);
-                signUp(v);
-                toggleGroup.setVisibility(View.VISIBLE);
-                loadingAnimation.setVisibility(View.GONE);
+                sendVerificationEmail();
             }
         });
 
@@ -76,45 +77,62 @@ public class SignUpActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
-    });
-}
+        });
+    }
 
-    public void signUp(View view) {
-        String name = editTextName.getText().toString().trim();
+    private void sendVerificationEmail() {
         String email = editTextEmail.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
-        String confirmPassword = editTextConfirmPassword.getText().toString().trim();
-
-        if (name.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-            Toast.makeText(this, "All fields are required", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (!password.equals(confirmPassword)) {
-            Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener() {
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
-                    public void onComplete(@NonNull Task task) {
+                    public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            addUserToFirestore(name, email);
-                            Toast.makeText(SignUpActivity.this, "Sign up successful", Toast.LENGTH_SHORT).show();
-
-                            Intent i = new Intent(SignUpActivity.this, LoginActivity.class);
-                            startActivity(i);
-                            overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
-                            finish();
+                            mAuth.getCurrentUser().sendEmailVerification()
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> verificationTask) {
+                                            if (verificationTask.isSuccessful()) {
+                                                Toast.makeText(SignUpActivity.this, "Verification email sent", Toast.LENGTH_SHORT).show();
+                                                toggleGroup.setVisibility(View.GONE);
+                                                loadingAnimation.setVisibility(View.VISIBLE);
+                                                checkEmailVerificationStatus();
+                                            } else {
+                                                Toast.makeText(SignUpActivity.this, "Failed to send verification email", Toast.LENGTH_SHORT).show();
+                                                toggleGroup.setVisibility(View.VISIBLE);
+                                                loadingAnimation.setVisibility(View.GONE);
+                                            }
+                                        }
+                                    });
                         } else {
-                            Toast.makeText(SignUpActivity.this, "Authentication failed. Try again", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SignUpActivity.this, "Failed to create account. Please try again", Toast.LENGTH_SHORT).show();
+                            toggleGroup.setVisibility(View.VISIBLE);
+                            loadingAnimation.setVisibility(View.GONE);
                         }
                     }
                 });
     }
 
-    private void addUserToFirestore(String name, String email) {
+    private void checkEmailVerificationStatus() {
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                FirebaseUser user = mAuth.getCurrentUser();
+                if (user != null) {
+                    user.reload();
+                    if (user.isEmailVerified()) {
+                        addUserToFirestore(editTextName.getText().toString().trim(), editTextEmail.getText().toString().trim());
+                    } else {
+                        checkEmailVerificationStatus();
+                    }
+                }
+            }
+        }, 2000);
+    }
+
+    public void addUserToFirestore(String name, String email) {
         Map<String, Object> user = new HashMap<>();
         user.put("name", name);
         user.put("email", email);
@@ -128,8 +146,15 @@ public class SignUpActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Toast.makeText(SignUpActivity.this, "Sign up successful", Toast.LENGTH_SHORT).show();
                             Log.d(TAG, "User details added to Firestore");
+                            Intent i = new Intent(SignUpActivity.this, LoginActivity.class);
+                            startActivity(i);
+                            overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+                            finish();
                         } else {
                             Log.w(TAG, "Error adding user details to Firestore", task.getException());
+                            Toast.makeText(SignUpActivity.this, "Error adding user details to Firestore", Toast.LENGTH_SHORT).show();
+                            toggleGroup.setVisibility(View.VISIBLE);
+                            loadingAnimation.setVisibility(View.GONE);
                         }
                     }
                 });
