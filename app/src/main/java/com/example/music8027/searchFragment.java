@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -15,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,11 +39,14 @@ public class searchFragment extends Fragment implements FetchDataTask.OnDataFetc
     private RecyclerView.LayoutManager layoutManager;
     private GridLayoutManager gridLayoutManager;
     private EditText searchSong;
+    private TextView detName, detType, detInfo, detCount;
+    private ImageView detImg;
     private static final String TAG = "searchFragment";
     private String songName = null;
     private String searchSpecifier = "";
     private LottieAnimationView loadingAnimation, noResult;
     private ArrayList<JSONObject> songDetails;
+    private String tmpString = null, tmpString2 = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -78,7 +84,14 @@ public class searchFragment extends Fragment implements FetchDataTask.OnDataFetc
         MaterialButton albumBtn = view.findViewById(R.id.albumSearch);
         MaterialButton artistBtn = view.findViewById(R.id.artistSearch);
         MaterialButton playlistBtn = view.findViewById(R.id.playlistSearch);
+        MaterialButton detAdd = view.findViewById(R.id.detailsAdd);
+        MaterialButton detClose = view.findViewById(R.id.detailsClose);
         searchSong = view.findViewById(R.id.search_input);
+        detImg = view.findViewById(R.id.detailsImg);
+        detName = view.findViewById(R.id.detailsName);
+        detType = view.findViewById(R.id.detailsType);
+        detInfo = view.findViewById(R.id.detailsInfo);
+        detCount = view.findViewById(R.id.detailsCount);
         loadingAnimation = view.findViewById(R.id.loading_animation);
         noResult = view.findViewById(R.id.no_result_animation);
 
@@ -151,6 +164,13 @@ public class searchFragment extends Fragment implements FetchDataTask.OnDataFetc
                 artistBtn.setIconTintResource(R.color.teal);
                 playlistBtn.setIconTintResource(R.color.red);
                 triggerSearch();
+            }
+        });
+
+        ((RecyclerAdapter) mAdapter).setOnItemClickListener(new RecyclerAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(String apiUrl) {
+
             }
         });
 
@@ -231,6 +251,90 @@ public class searchFragment extends Fragment implements FetchDataTask.OnDataFetc
     @Override
     public void onDataFetched(ArrayList<JSONObject> songData) {
         songDetails = songData;
-        // Now you can use songDetails as needed
+        JSONObject objectDetails = null;
+        try{
+            objectDetails = (JSONObject) songDetails.get(0).getJSONArray("data").get(0);
+            if (objectDetails.getString("type").equals("song")) {
+                if (objectDetails.has("artists") && objectDetails.has("album")) {
+                    if (objectDetails.getJSONObject("artists").has("primary"))
+                        tmpString = objectDetails.getJSONObject("artists").getJSONArray("primary").getJSONObject(0).getString("name");
+                    if (objectDetails.has("album")) {
+                        if (objectDetails.getJSONObject("album").has("name"))
+                            tmpString2 = objectDetails.getJSONObject("album").getString("name");
+                    }
+                    detInfo.setText(String.format("%s - %s", tmpString, tmpString2));
+                } else if (objectDetails.has("artists")) {
+                    if (objectDetails.getJSONObject("artists").has("primary"))
+                        tmpString = objectDetails.getJSONObject("artists").getJSONArray("primary").getJSONObject(0).getString("name");
+                    detInfo.setText(tmpString);
+                } else if (objectDetails.has("album")) {
+                    if (objectDetails.getJSONObject("album").has("name"))
+                        tmpString2 = objectDetails.getJSONObject("album").getString("name");
+                    detInfo.setText(tmpString2);
+                } else
+                    detInfo.setText("null");
+                if (objectDetails.has("playCount"))
+                    detCount.setText(objectDetails.getString("playCount"));
+                else
+                    detCount.setText("null");
+            } else if (objectDetails.getString("type").equals("artist")) {
+                if (objectDetails.has("bio")) {
+                    if (objectDetails.has("bio")) {
+                        if (objectDetails.getJSONObject("bio").has("title"))
+                            tmpString = objectDetails.getJSONObject("bio").getString("title");
+                    }
+                    detInfo.setText(tmpString);
+                } else
+                    detInfo.setText("null");
+                if (objectDetails.has("followerCount"))
+                    detCount.setText(objectDetails.getString("followerCount"));
+                else
+                    detCount.setText("null");
+            } else if (objectDetails.getString("type").equals("album")) {
+                if (objectDetails.has("artists") && objectDetails.has("bio")) {
+                    if (objectDetails.getJSONObject("artists").has("primary"))
+                        tmpString = objectDetails.getJSONObject("artists").getJSONArray("primary").getJSONObject(0).getString("name");
+                    if (objectDetails.has("bio")) {
+                        if (objectDetails.getJSONObject("bio").has("title"))
+                            tmpString2 = objectDetails.getJSONObject("bio").getString("title");
+                    }
+                    detInfo.setText(String.format("%s - %s", tmpString, tmpString2));
+                } else if (objectDetails.has("artists")) {
+                    if (objectDetails.getJSONObject("artists").has("primary"))
+                        tmpString = objectDetails.getJSONObject("artists").getJSONArray("primary").getJSONObject(0).getString("name");
+                    detInfo.setText(tmpString);
+                } else if (objectDetails.has("bio")) {
+                    if (objectDetails.getJSONObject("bio").has("title"))
+                        tmpString2 = objectDetails.getJSONObject("bio").getString("title");
+                    detInfo.setText(tmpString2);
+                } else
+                    detInfo.setText("null");
+                if (!objectDetails.has("playCount"))
+                    detCount.setText("null");
+                else
+                    detCount.setText(objectDetails.getString("playCount"));
+            } else if (objectDetails.getString("type").equals("playlist")) {
+                if (objectDetails.has("description"))
+                    detInfo.setText(objectDetails.getString("description"));
+                else
+                    detInfo.setText("null");
+                if (!objectDetails.has("playCount"))
+                    detCount.setText("null");
+                else
+                    detCount.setText(objectDetails.getString("playCount"));
+            }
+            if (objectDetails.has("name"))
+                detName.setText(objectDetails.getString("name"));
+            else
+                detName.setText("unknown");
+            if (objectDetails.has("image")) {
+                int len = objectDetails.getJSONArray("image").length();
+                Picasso.get().load(objectDetails.getJSONArray("image").getJSONObject(len - 1).getString("url")).into(detImg);
+            } else
+                Picasso.get().load(R.drawable.vinyl).into(detImg);
+            detType.setText(objectDetails.getString("type"));
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
