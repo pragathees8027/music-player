@@ -23,21 +23,32 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemViewHolder> {
 
     private final Context context;
     private final List<Object> listRecyclerItem;
     private String searchType;
-    private OnItemClickListener mListener;
+    private static OnItemClickListener mListener;
+    private static OnTaskStatusListener taskStatusListener;
+    public interface OnTaskStatusListener {
+        void onTaskStart();
+        void onTaskComplete();
+    }
+
+    public void setTaskStatusListener(OnTaskStatusListener listener) {
+        this.taskStatusListener = listener;
+    }
 
     public interface OnItemClickListener {
-        void onItemClick(String apiUrl);
+        void onItemClick(String apiUrl) throws ExecutionException, InterruptedException;
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         mListener = listener;
     }
+
 
     public RecyclerAdapter(Context context, List<Object> listRecyclerItem, String searchType) {
         this.context = context;
@@ -60,7 +71,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemVi
         }
     }
 
-    public static class ItemViewHolder extends RecyclerView.ViewHolder {
+    public class ItemViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView song_name;
         private final TextView song_info;
@@ -165,22 +176,66 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemVi
         return listRecyclerItem.size();
     }
 
-    private class FetchSongDataTask extends AsyncTask<String, Void, JSONObject> {
+    public static class FetchSongDataTask extends AsyncTask<String, Void, JSONObject> {
+
         @Override
-        protected JSONObject doInBackground(String... params) {
-            String objectUrlString = params[0];
-            return fetchSongData(objectUrlString);
+        protected void onPreExecute() {
+            super.onPreExecute();
+            if (taskStatusListener != null) {
+                taskStatusListener.onTaskStart();
+            }
         }
 
         @Override
+        protected JSONObject doInBackground(String... params) {
+            JSONObject songData = null;
+            try {
+                String objectUrlString = params[0];
+                URL objectUrl = new URL(objectUrlString);
+                HttpURLConnection connection = (HttpURLConnection) objectUrl.openConnection();
+                connection.setRequestMethod("GET");
+
+                StringBuilder response = new StringBuilder();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                songData = new JSONObject(response.toString());
+
+                connection.disconnect();
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+            }
+            return songData;
+        }
+
+        /*@Override
+        protected JSONObject doInBackground(String... params) {
+            String objectUrlString = params[0];
+            return fetchSongData(objectUrlString);
+        }*/
+
+        @Override
         protected void onPostExecute(JSONObject songData) {
+            if (taskStatusListener != null) {
+                taskStatusListener.onTaskComplete();
+            }
             if (mListener != null) {
-                mListener.onItemClick(String.valueOf(songData));
+                try {
+                    mListener.onItemClick(String.valueOf(songData));
+                } catch (ExecutionException e) {
+                    throw new RuntimeException(e);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
 
-    private JSONObject fetchSongData(String objectUrlString) {
+    /*private JSONObject fetchSongData(String objectUrlString) {
         JSONObject songData = null;
         try {
             URL objectUrl = new URL(objectUrlString);
@@ -202,5 +257,5 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemVi
             e.printStackTrace();
         }
         return songData;
-    }
+    }*/
 }

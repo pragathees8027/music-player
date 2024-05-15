@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -16,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -30,8 +30,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
-public class searchFragment extends Fragment implements FetchDataTask.OnDataFetchedListener {
+public class searchFragment extends Fragment implements FetchDataTask.OnDataFetchedListener, RecyclerAdapter.OnTaskStatusListener  {
     private RecyclerView mRecyclerView;
     private List<Object> viewItems = new ArrayList<>();
     private ArrayList<JSONObject> searchResult;
@@ -47,6 +48,8 @@ public class searchFragment extends Fragment implements FetchDataTask.OnDataFetc
     private LottieAnimationView loadingAnimation, noResult;
     private ArrayList<JSONObject> songDetails;
     private String tmpString = null, tmpString2 = null;
+    private JSONObject objectDetails = null;
+    private Toast toast;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -78,7 +81,6 @@ public class searchFragment extends Fragment implements FetchDataTask.OnDataFetc
         mRecyclerView.setAdapter(mAdapter);
 
         MaterialButton search = view.findViewById(R.id.search_button);
-        //MaterialButtonToggleGroup searchSpec = view.findViewById(R.id.search_specifier);
         MaterialButton topBtn = view.findViewById(R.id.topSearch);
         MaterialButton songBtn = view.findViewById(R.id.songSearch);
         MaterialButton albumBtn = view.findViewById(R.id.albumSearch);
@@ -169,8 +171,8 @@ public class searchFragment extends Fragment implements FetchDataTask.OnDataFetc
 
         ((RecyclerAdapter) mAdapter).setOnItemClickListener(new RecyclerAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(String apiUrl) {
-
+            public void onItemClick(String apiUrl) throws ExecutionException, InterruptedException {
+                new RecyclerAdapter.FetchSongDataTask().execute(apiUrl);
             }
         });
 
@@ -251,7 +253,7 @@ public class searchFragment extends Fragment implements FetchDataTask.OnDataFetc
     @Override
     public void onDataFetched(ArrayList<JSONObject> songData) {
         songDetails = songData;
-        JSONObject objectDetails = null;
+        //JSONObject objectDetails = null;
         try{
             objectDetails = (JSONObject) songDetails.get(0).getJSONArray("data").get(0);
             if (objectDetails.getString("type").equals("song")) {
@@ -336,5 +338,19 @@ public class searchFragment extends Fragment implements FetchDataTask.OnDataFetc
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void onTaskStart() {
+        // Show a toast at the start of the task
+        toast.setText("Fetching data...");
+        toast.show();
+    }
+
+    @Override
+    public void onTaskComplete() {
+        // Show a toast at the end of the task
+        toast.setText("Data fetched successfully.");
+        toast.show();
     }
 }
