@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.button.MaterialButtonToggleGroup;
+import com.google.android.material.card.MaterialCardView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,6 +45,9 @@ public class searchFragment extends Fragment {
     private String songName = null;
     private String searchSpecifier = "";
     private LottieAnimationView loadingAnimation, noResult;
+    private MaterialCardView detCard;
+    private MaterialButton search, topBtn, songBtn, albumBtn, artistBtn, playlistBtn, detAdd, detClose;
+    MaterialButtonToggleGroup searchToggle;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -71,7 +76,28 @@ public class searchFragment extends Fragment {
             @Override
             public void onItemClick(int position) throws JSONException {
                 String objectID = searchResult.get(position).getString("id");
-                Log.e(TAG, objectID);
+                String type = searchResult.get(position).getString("type");;
+                String searchSpec = null;
+                switch (type) {
+                    case "song":
+                        searchSpec = "songs/";
+                        break;
+
+                    case "album":
+                        searchSpec = "albums?id=";
+                        break;
+
+                    case "artist":
+                        searchSpec = "artists/";
+                        break;
+
+                    case "playlist":
+                        searchSpec = "playlists?id=";
+                        break;
+                }
+                String objectUrl = "https://saavn.dev/api/" + searchSpec + objectID;
+                Log.e(TAG, objectUrl);
+                new FetchSongDataTask().execute(objectUrl);
             }
         });
 
@@ -79,14 +105,15 @@ public class searchFragment extends Fragment {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mAdapter);
 
-        MaterialButton search = view.findViewById(R.id.search_button);
-        MaterialButton topBtn = view.findViewById(R.id.topSearch);
-        MaterialButton songBtn = view.findViewById(R.id.songSearch);
-        MaterialButton albumBtn = view.findViewById(R.id.albumSearch);
-        MaterialButton artistBtn = view.findViewById(R.id.artistSearch);
-        MaterialButton playlistBtn = view.findViewById(R.id.playlistSearch);
-        MaterialButton detAdd = view.findViewById(R.id.detailsAdd);
-        MaterialButton detClose = view.findViewById(R.id.detailsClose);
+        searchToggle = view.findViewById(R.id.search_specifier);
+        search = view.findViewById(R.id.search_button);
+        topBtn = view.findViewById(R.id.topSearch);
+        songBtn = view.findViewById(R.id.songSearch);
+        albumBtn = view.findViewById(R.id.albumSearch);
+        artistBtn = view.findViewById(R.id.artistSearch);
+        playlistBtn = view.findViewById(R.id.playlistSearch);
+        detAdd = view.findViewById(R.id.detailsAdd);
+        detClose = view.findViewById(R.id.detailsClose);
         searchSong = view.findViewById(R.id.search_input);
         detImg = view.findViewById(R.id.detailsImg);
         detName = view.findViewById(R.id.detailsName);
@@ -95,8 +122,7 @@ public class searchFragment extends Fragment {
         detCount = view.findViewById(R.id.detailsCount);
         loadingAnimation = view.findViewById(R.id.loading_animation);
         noResult = view.findViewById(R.id.no_result_animation);
-
-        view.findViewById(R.id.detailsCard).setVisibility(View.GONE);
+        detCard = view.findViewById(R.id.detailsCard);
 
         search.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -244,4 +270,49 @@ public class searchFragment extends Fragment {
         new FetchDataTask().execute(songName);
     }
 
+    public class FetchSongDataTask extends AsyncTask<String, Void, JSONObject> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            noResult.setVisibility(View.GONE);
+            mRecyclerView.setVisibility(View.GONE);
+            loadingAnimation.setVisibility(View.VISIBLE);
+
+        }
+
+        @Override
+        protected JSONObject doInBackground(String... params) {
+            JSONObject songData = null;
+            try {
+                String objectUrlString = params[0];
+                URL objectUrl = new URL(objectUrlString);
+                HttpURLConnection connection = (HttpURLConnection) objectUrl.openConnection();
+                connection.setRequestMethod("GET");
+
+                StringBuilder response = new StringBuilder();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                songData = new JSONObject(response.toString());
+
+                connection.disconnect();
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+            }
+            return songData;
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject songData) {
+            search.setVisibility(View.GONE);
+            searchSong.setVisibility(View.GONE);
+            searchToggle.setVisibility(View.GONE);
+            loadingAnimation.setVisibility(View.GONE);
+        }
+    }
 }
