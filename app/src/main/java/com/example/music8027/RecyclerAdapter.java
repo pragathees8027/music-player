@@ -29,15 +29,20 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemVi
 
     private final Context context;
     private final List<Object> listRecyclerItem;
+    public interface OnItemClickListener {
+        void onItemClick(int position) throws JSONException;
+    }
     private String searchType;
+    private OnItemClickListener listener;
 
 
-    public RecyclerAdapter(Context context, List<Object> listRecyclerItem, String searchType) {
+    public RecyclerAdapter(Context context, List<Object> listRecyclerItem, String searchType,  OnItemClickListener listener) {
         this.context = context;
         this.listRecyclerItem = listRecyclerItem;
         if (!searchType.equals(""))
             searchType = searchType.substring(1);
         this.searchType = searchType;
+        this.listener = listener;
     }
 
     @Override
@@ -113,6 +118,15 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemVi
                 Picasso.get().load(songUnit.getJSONArray("image").getJSONObject(len - 1).getString("url")).into(viewHolder.song_art);
             } else
                 Picasso.get().load(R.drawable.vinyl).into(viewHolder.song_art);
+            viewHolder.itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    try {
+                        listener.onItemClick(i);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }

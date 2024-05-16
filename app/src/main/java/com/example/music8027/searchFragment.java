@@ -67,10 +67,16 @@ public class searchFragment extends Fragment {
             }
         });
 
+        mAdapter = new RecyclerAdapter(getContext(), viewItems, searchSpecifier, new RecyclerAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) throws JSONException {
+                String objectID = searchResult.get(position).getString("id");
+                Log.e(TAG, objectID);
+            }
+        });
+
         layoutManager = gridLayoutManager;
         mRecyclerView.setLayoutManager(layoutManager);
-
-        mAdapter = new RecyclerAdapter(getContext(), viewItems, searchSpecifier);
         mRecyclerView.setAdapter(mAdapter);
 
         MaterialButton search = view.findViewById(R.id.search_button);
