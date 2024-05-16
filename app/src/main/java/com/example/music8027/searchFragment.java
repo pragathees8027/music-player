@@ -18,6 +18,7 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.card.MaterialCardView;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,6 +30,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class searchFragment extends Fragment {
@@ -39,15 +41,16 @@ public class searchFragment extends Fragment {
     private RecyclerView.LayoutManager layoutManager;
     private GridLayoutManager gridLayoutManager;
     private EditText searchSong;
-    private TextView detName, detType, detInfo, detCount;
+    private TextView detName, detInfo, fullText;
     private ImageView detImg;
     private static final String TAG = "searchFragment";
     private String songName = null;
     private String searchSpecifier = "";
     private LottieAnimationView loadingAnimation, noResult;
     private MaterialCardView detCard;
-    private MaterialButton search, topBtn, songBtn, albumBtn, artistBtn, playlistBtn, detAdd, detClose;
-    MaterialButtonToggleGroup searchToggle;
+    private MaterialButton search, topBtn, songBtn, albumBtn, artistBtn, playlistBtn, detAdd, detClose, songList, songSuggest, albumList, artistList, artistSuggest;
+    private MaterialButtonToggleGroup searchToggle;
+    private List<String> keysToInclude = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -117,12 +120,16 @@ public class searchFragment extends Fragment {
         searchSong = view.findViewById(R.id.search_input);
         detImg = view.findViewById(R.id.detailsImg);
         detName = view.findViewById(R.id.detailsName);
-        detType = view.findViewById(R.id.detailsType);
         detInfo = view.findViewById(R.id.detailsInfo);
-        detCount = view.findViewById(R.id.detailsCount);
+        fullText = view.findViewById(R.id.fullText);
         loadingAnimation = view.findViewById(R.id.loading_animation);
         noResult = view.findViewById(R.id.no_result_animation);
         detCard = view.findViewById(R.id.detailsCard);
+        albumList = view.findViewById(R.id.albumList);
+        songList = view.findViewById(R.id.songList);
+        artistList = view.findViewById(R.id.artistList);
+        songSuggest = view.findViewById(R.id.songSuggest);
+        artistSuggest = view.findViewById(R.id.artistSuggest);
 
         search.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -193,6 +200,22 @@ public class searchFragment extends Fragment {
                 artistBtn.setIconTintResource(R.color.teal);
                 playlistBtn.setIconTintResource(R.color.red);
                 triggerSearch();
+            }
+        });
+
+        detClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                songSuggest.setVisibility(View.GONE);
+                artistSuggest.setVisibility(View.GONE);
+                artistList.setVisibility(View.GONE);
+                albumList.setVisibility(View.GONE);
+                songList.setVisibility(View.GONE);
+                detCard.setVisibility(View.GONE);
+                search.setVisibility(View.VISIBLE);
+                searchSong.setVisibility(View.VISIBLE);
+                searchToggle.setVisibility(View.VISIBLE);
+                mRecyclerView.setVisibility(View.VISIBLE);
             }
         });
 
@@ -309,10 +332,143 @@ public class searchFragment extends Fragment {
 
         @Override
         protected void onPostExecute(JSONObject songData) {
+            detCard.setVisibility(View.VISIBLE);
             search.setVisibility(View.GONE);
             searchSong.setVisibility(View.GONE);
             searchToggle.setVisibility(View.GONE);
             loadingAnimation.setVisibility(View.GONE);
+
+            try{
+                String tmpString = null, tmpString2 = null;
+                JSONObject objectDetails;
+                if ((Object)songData.get("data") instanceof  JSONArray)
+                    objectDetails = (JSONObject) songData.getJSONArray("data").get(0);
+                else
+                    objectDetails = (JSONObject) songData.getJSONObject("data");
+                if (objectDetails.getString("type").equals("song")) {
+                    if (objectDetails.has("artists") && objectDetails.has("album")) {
+                        if (objectDetails.getJSONObject("artists").has("primary"))
+                            tmpString = objectDetails.getJSONObject("artists").getJSONArray("primary").getJSONObject(0).getString("name");
+                        if (objectDetails.has("album")) {
+                            if (objectDetails.getJSONObject("album").has("name"))
+                                tmpString2 = objectDetails.getJSONObject("album").getString("name");
+                        }
+                        detInfo.setText(String.format("%s - %s", tmpString, tmpString2));
+                    } else if (objectDetails.has("artists")) {
+                        if (objectDetails.getJSONObject("artists").has("primary"))
+                            tmpString = objectDetails.getJSONObject("artists").getJSONArray("primary").getJSONObject(0).getString("name");
+                        detInfo.setText(tmpString);
+                    } else if (objectDetails.has("album")) {
+                        if (objectDetails.getJSONObject("album").has("name"))
+                            tmpString2 = objectDetails.getJSONObject("album").getString("name");
+                        detInfo.setText(tmpString2);
+                    } else
+                        detInfo.setText("null");
+                    songSuggest.setVisibility(View.VISIBLE);
+                    artistList.setVisibility(View.VISIBLE);
+                    albumList.setVisibility(View.VISIBLE);
+                } else if (objectDetails.getString("type").equals("artist")) {
+                    if (objectDetails.has("fanCount")) {
+                        tmpString = objectDetails.getString("fanCount");
+                        tmpString2 = objectDetails.getString("followerCount");
+                        if (Integer.valueOf(tmpString) > Integer.valueOf(tmpString2))
+                            detInfo.setText("Fans: " + tmpString);
+                        else
+                            detInfo.setText("Followers: " + tmpString2);
+                    } else
+                        detInfo.setText("null");
+                    songList.setVisibility(View.VISIBLE);
+                    albumList.setVisibility(View.VISIBLE);
+                    artistSuggest.setVisibility(View.VISIBLE);
+                } else if (objectDetails.getString("type").equals("album")) {
+                    if (objectDetails.has("description")) {
+                        tmpString2 = objectDetails.getString("description");
+                        detInfo.setText(tmpString2);
+                    } else if (objectDetails.has("artists")) {
+                        if (objectDetails.getJSONObject("artists").has("primary"))
+                            tmpString = objectDetails.getJSONObject("artists").getJSONArray("primary").getJSONObject(0).getString("name");
+                        detInfo.setText(tmpString);
+                    } else
+                        detInfo.setText("null");
+                    songList.setVisibility(View.VISIBLE);
+                    artistList.setVisibility(View.VISIBLE);
+                } else if (objectDetails.getString("type").equals("playlist")) {
+                    if (objectDetails.has("description"))
+                        detInfo.setText(objectDetails.getString("description"));
+                    else
+                        detInfo.setText("null");
+                    songList.setVisibility(View.VISIBLE);
+                }
+                if (objectDetails.has("name"))
+                    detName.setText(objectDetails.getString("name"));
+                else
+                    detName.setText("unknown");
+                if (objectDetails.has("image")) {
+                    int len = objectDetails.getJSONArray("image").length();
+                    Picasso.get().load(objectDetails.getJSONArray("image").getJSONObject(len - 1).getString("url")).into(detImg);
+                } else
+                    Picasso.get().load(R.drawable.vinyl).into(detImg);
+                fullText.setText(convertJsonToString(objectDetails, getKeyList()));
+            } catch (JSONException e) {
+                Log.e(TAG, "Error fetching data", e);
+            }
         }
+    }
+
+    public String convertJsonToString(JSONObject jsonObject, List<String> keyList) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (Iterator<String> it = jsonObject.keys(); it.hasNext(); ) {
+            String key = it.next();
+            if (keyList.contains(key) && jsonObject.has(key)) {
+                try {
+                    if (key.equals("availableLanguages") && jsonObject.has("availableLanguages")){
+                        String langList = "";
+                        JSONArray langArray = jsonObject.getJSONArray("availableLanguages");
+                        for (int i = 0; i < langArray.length() ; i++){
+                            if (langArray.getString(i).equals("unknown"))
+                                continue;;
+                            langList = langList + langArray.getString(i) + ", ";
+                        }
+                        if (!langList.isEmpty()) {
+                            langList = langList.substring(0, langList.length()-2);
+                            stringBuilder.append(key.toUpperCase()).append(": \n").append(langList).append("\n\n");
+                        }
+                    }
+                    else
+                        stringBuilder.append(key.toUpperCase()).append(": \n").append(jsonObject.get(key)).append("\n\n");
+                } catch (JSONException e) {
+                    Log.e(TAG, "Error fetching key", e);
+                }
+            }
+        }
+
+        if (stringBuilder.length() > 0) {
+            stringBuilder.setLength(stringBuilder.length() - 2);
+        }
+
+        return stringBuilder.toString();
+    }
+
+    public List<String> getKeyList() {
+        keysToInclude.add("name");
+        keysToInclude.add("type");
+        keysToInclude.add("year");
+        keysToInclude.add("description");
+        keysToInclude.add("releaseDate");
+        keysToInclude.add("duration");
+        keysToInclude.add("label");
+        keysToInclude.add("explicitContent");
+        keysToInclude.add("playCount");
+        keysToInclude.add("songCount");
+        keysToInclude.add("followerCount");
+        keysToInclude.add("fanCount");
+        keysToInclude.add("isVerified");
+        keysToInclude.add("dominantLanguage");
+        keysToInclude.add("dominantType");
+        keysToInclude.add("availableLanguages");
+        keysToInclude.add("copyright");
+
+        return keysToInclude;
     }
 }
