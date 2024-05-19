@@ -9,15 +9,20 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.card.MaterialCardView;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -32,6 +37,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.DocumentReference;
+import java.util.HashMap;
+import java.util.Map;
 
 public class searchFragment extends Fragment {
     private RecyclerView mRecyclerView;
@@ -46,11 +57,13 @@ public class searchFragment extends Fragment {
     private static final String TAG = "searchFragment";
     private String songName = null;
     private String searchSpecifier = "";
+    private String objectID = "";
     private LottieAnimationView loadingAnimation, noResult;
     private MaterialCardView detCard;
     private MaterialButton search, topBtn, songBtn, albumBtn, artistBtn, playlistBtn, detAdd, detClose, songList, songSuggest, albumList, artistList, artistSuggest;
     private MaterialButtonToggleGroup searchToggle;
     private List<String> keysToInclude = new ArrayList<>();
+    private int objectPosition;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -78,7 +91,8 @@ public class searchFragment extends Fragment {
         mAdapter = new RecyclerAdapter(getContext(), viewItems, searchSpecifier, new RecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) throws JSONException {
-                String objectID = searchResult.get(position).getString("id");
+                objectPosition = position;
+                objectID = searchResult.get(position).getString("id");
                 String type = searchResult.get(position).getString("type");;
                 String searchSpec = null;
                 switch (type) {
@@ -142,7 +156,7 @@ public class searchFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 searchSpecifier = "";
-                topBtn.setIconTintResource(R.color.red);
+                topBtn.setIconTintResource(R.color.glass_red);
                 songBtn.setIconTintResource(R.color.teal);
                 albumBtn.setIconTintResource(R.color.teal);
                 artistBtn.setIconTintResource(R.color.teal);
@@ -156,7 +170,7 @@ public class searchFragment extends Fragment {
             public void onClick(View v) {
                 searchSpecifier = "/songs";
                 topBtn.setIconTintResource(R.color.teal);
-                songBtn.setIconTintResource(R.color.red);
+                songBtn.setIconTintResource(R.color.glass_red);
                 albumBtn.setIconTintResource(R.color.teal);
                 artistBtn.setIconTintResource(R.color.teal);
                 playlistBtn.setIconTintResource(R.color.teal);
@@ -170,7 +184,7 @@ public class searchFragment extends Fragment {
                 searchSpecifier = "/albums";
                 topBtn.setIconTintResource(R.color.teal);
                 songBtn.setIconTintResource(R.color.teal);
-                albumBtn.setIconTintResource(R.color.red);
+                albumBtn.setIconTintResource(R.color.glass_red);
                 artistBtn.setIconTintResource(R.color.teal);
                 playlistBtn.setIconTintResource(R.color.teal);
                 triggerSearch();
@@ -184,7 +198,7 @@ public class searchFragment extends Fragment {
                 topBtn.setIconTintResource(R.color.teal);
                 songBtn.setIconTintResource(R.color.teal);
                 albumBtn.setIconTintResource(R.color.teal);
-                artistBtn.setIconTintResource(R.color.red);
+                artistBtn.setIconTintResource(R.color.glass_red);
                 playlistBtn.setIconTintResource(R.color.teal);
                 triggerSearch();
             }
@@ -198,7 +212,7 @@ public class searchFragment extends Fragment {
                 songBtn.setIconTintResource(R.color.teal);
                 albumBtn.setIconTintResource(R.color.teal);
                 artistBtn.setIconTintResource(R.color.teal);
-                playlistBtn.setIconTintResource(R.color.red);
+                playlistBtn.setIconTintResource(R.color.glass_red);
                 triggerSearch();
             }
         });
@@ -219,10 +233,82 @@ public class searchFragment extends Fragment {
             }
         });
 
+        detAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (objectID != null && !objectID.isEmpty()) {
+                    JSONObject jsonObject = searchResult.get(objectPosition);
+                    String jsonString = jsonObject.toString();
+                    loadingAnimation.setVisibility(View.VISIBLE);
+                    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                    FirebaseUser currentUser = mAuth.getCurrentUser();
+
+                    if (currentUser != null) {
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                        DocumentReference userDocRef = db.collection("users").document(currentUser.getUid());
+                        userDocRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                if (documentSnapshot.exists()) {
+                                    List<String> currentSongs = (List<String>) documentSnapshot.get("userSongs");
+                                    if (currentSongs == null) {
+                                        currentSongs = new ArrayList<>();
+                                    }
+                                    if (!currentSongs.contains(jsonString)) {
+                                        currentSongs.add(jsonString);
+                                        Map<String, Object> updates = new HashMap<>();
+                                        updates.put("userSongs", currentSongs);
+                                        userDocRef.update(updates)
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Log.d(TAG, "ObjectID added to Firestore songs array successfully!");
+                                                        Toast.makeText(requireContext(), "Added song to user's list", Toast.LENGTH_SHORT).show();
+                                                        loadingAnimation.setVisibility(View.GONE);
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Log.e(TAG, "Error updating document", e);
+                                                        Toast.makeText(requireContext(), "Error while adding song", Toast.LENGTH_SHORT).show();
+                                                        loadingAnimation.setVisibility(View.GONE);
+                                                    }
+                                                });
+                                    } else {
+                                        Log.d(TAG, "ObjectID already exists in Firestore songs array!");
+                                        Toast.makeText(requireContext(), "Song is already present on user's list", Toast.LENGTH_SHORT).show();
+                                        loadingAnimation.setVisibility(View.GONE);
+                                    }
+                                } else {
+                                    Log.d(TAG, "Document does not exist");
+                                    Toast.makeText(requireContext(), "Firestore db error", Toast.LENGTH_SHORT).show();
+                                    loadingAnimation.setVisibility(View.GONE);
+                                }
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.e(TAG, "Error fetching document", e);
+                                Toast.makeText(requireContext(), "Error fetching user's list", Toast.LENGTH_SHORT).show();
+                                loadingAnimation.setVisibility(View.GONE);
+                            }
+                        });
+                    } else {
+                        Toast.makeText(requireContext(), "User not logged in", Toast.LENGTH_SHORT).show();
+                        loadingAnimation.setVisibility(View.GONE);
+                    }
+                } else {
+                    Toast.makeText(requireContext(), "Song id null", Toast.LENGTH_SHORT).show();
+                    loadingAnimation.setVisibility(View.GONE);
+                }
+            }
+        });
+
         return view;
     }
 
-    private class FetchDataTask extends AsyncTask<String, Void, ArrayList<JSONObject>> {
+    public class FetchDataTask extends AsyncTask<String, Void, ArrayList<JSONObject>> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -367,6 +453,7 @@ public class searchFragment extends Fragment {
                     songSuggest.setVisibility(View.VISIBLE);
                     artistList.setVisibility(View.VISIBLE);
                     albumList.setVisibility(View.VISIBLE);
+                    detAdd.setVisibility(View.VISIBLE);
                 } else if (objectDetails.getString("type").equals("artist")) {
                     if (objectDetails.has("fanCount")) {
                         tmpString = objectDetails.getString("fanCount");
@@ -380,6 +467,7 @@ public class searchFragment extends Fragment {
                     songList.setVisibility(View.VISIBLE);
                     albumList.setVisibility(View.VISIBLE);
                     artistSuggest.setVisibility(View.VISIBLE);
+                    detAdd.setVisibility(View.GONE);
                 } else if (objectDetails.getString("type").equals("album")) {
                     if (objectDetails.has("description")) {
                         tmpString2 = objectDetails.getString("description");
@@ -392,12 +480,14 @@ public class searchFragment extends Fragment {
                         detInfo.setText("null");
                     songList.setVisibility(View.VISIBLE);
                     artistList.setVisibility(View.VISIBLE);
+                    detAdd.setVisibility(View.GONE);
                 } else if (objectDetails.getString("type").equals("playlist")) {
                     if (objectDetails.has("description"))
                         detInfo.setText(objectDetails.getString("description"));
                     else
                         detInfo.setText("null");
                     songList.setVisibility(View.VISIBLE);
+                    detAdd.setVisibility(View.GONE);
                 }
                 if (objectDetails.has("name"))
                     detName.setText(objectDetails.getString("name"));

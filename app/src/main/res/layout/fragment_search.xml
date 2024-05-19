@@ -78,7 +78,7 @@
                     android:layout_width="80sp"
                     android:layout_height="match_parent"
                     app:icon="@drawable/trending_up_24px"
-                    app:iconTint="@color/red"
+                    app:iconTint="@color/glass_red"
                     app:iconGravity="textStart"
                     app:iconPadding="0dp"
                     app:iconSize="30sp" />
@@ -185,7 +185,7 @@
                     app:iconGravity="textStart"
                     app:iconPadding="0dp"
                     app:iconSize="40sp"
-                    app:iconTint="@color/red"
+                    app:iconTint="@color/glass_red"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/imgCard"
                     app:layout_constraintTop_toTopOf="parent" />
