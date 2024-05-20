@@ -23,19 +23,65 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:layout_editor_absoluteX="0dp" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/reload"
-            android:layout_width="80sp"
-            android:layout_height="65sp"
-            android:visibility="visible"
-            app:icon="@drawable/sync_24px"
-            android:background="@color/glass"
-            app:iconGravity="textStart"
-            app:iconPadding="0dp"
-            app:iconSize="35sp"
-            app:iconTint="@color/glass_blue"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/search_specifier"
+            android:layout_width="match_parent"
+            android:layout_height="80sp"
+            android:layout_marginTop="10sp"
+            app:singleSelection="true"
+            android:gravity="center"
+            app:selectionRequired="true"
+            android:backgroundTint="@color/light_grey"
+            app:layout_constraintTop_toBottomOf="@+id/home">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/songSearch"
+                android:layout_width="80sp"
+                android:layout_height="match_parent"
+                app:icon="@drawable/music_note_24px"
+                app:iconGravity="textStart"
+                app:iconTint="@color/glass_red"
+                app:iconPadding="0dp"
+                app:iconSize="30sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/albumSearch"
+                android:layout_width="80sp"
+                android:layout_height="match_parent"
+                app:icon="@drawable/album_24px"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="30sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/artistSearch"
+                android:layout_width="80sp"
+                android:layout_height="match_parent"
+                app:icon="@drawable/person_24px"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="30sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/playlistSearch"
+                android:layout_width="80sp"
+                android:layout_height="match_parent"
+                app:icon="@drawable/playlist_play_24px"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="30sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/reload"
+                android:layout_width="80sp"
+                android:layout_height="match_parent"
+                app:icon="@drawable/sync_24px"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="30sp"
+                app:iconTint="@color/glass_blue" />
+
+        </com.google.android.material.button.MaterialButtonToggleGroup>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/song_recycle_view"
@@ -43,12 +89,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollbars="none"
-            android:layout_marginTop="80sp"
+            android:layout_marginTop="160sp"
             android:paddingStart="5sp"
-            android:paddingEnd="5sp"
+            android:paddingEnd="0sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
+            tools:layout_editor_absoluteY="121dp"
             tools:listitem="@layout/list_item">
 
         </androidx.recyclerview.widget.RecyclerView>
@@ -115,7 +162,7 @@
                     app:iconGravity="textStart"
                     app:iconPadding="0dp"
                     app:iconSize="40sp"
-                    app:iconTint="@color/glass_teal"
+                    app:iconTint="@color/teal"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/imgCard"
                     app:layout_constraintTop_toBottomOf="@+id/detailsClose" />
@@ -288,4 +335,5 @@
             app:lottie_rawRes="@raw/no_result" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </FrameLayout>

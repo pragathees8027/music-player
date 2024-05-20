@@ -129,7 +129,7 @@
             android:scrollbars="none"
             android:layout_marginTop="245sp"
             android:paddingStart="5sp"
-            android:paddingEnd="5sp"
+            android:paddingEnd="0sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"

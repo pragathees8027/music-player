@@ -229,6 +229,22 @@ public class SignUpActivity extends AppCompatActivity {
                         }
                     }
                 });
+
+        db.collection("userSongs")
+                .document(mAuth.getCurrentUser().getUid())
+                .set(user);
+
+        db.collection("userAlbums")
+                .document(mAuth.getCurrentUser().getUid())
+                .set(user);
+
+        db.collection("userArtists")
+                .document(mAuth.getCurrentUser().getUid())
+                .set(user);
+
+        db.collection("userPlaylists")
+                .document(mAuth.getCurrentUser().getUid())
+                .set(user);
     }
 
     @Override

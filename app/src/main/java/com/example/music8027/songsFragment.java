@@ -55,7 +55,7 @@ public class songsFragment extends Fragment {
     private ArrayList<JSONObject> searchResult = new ArrayList<JSONObject>();
     private List<String> songsList;
     private static final String TAG = "songsFragment";
-    private MaterialButton detAdd, detDel, detClose, songList, songSuggest, albumList, artistList, artistSuggest, reload;
+    private MaterialButton songBtn, albumBtn, artistBtn, playlistBtn, detAdd, detDel, detClose, songList, songSuggest, albumList, artistList, artistSuggest, reload;
     private LottieAnimationView loadingAnimation, noResult;
     private MaterialCardView detCard;
     private TextView detName, detInfo, fullText;
@@ -63,6 +63,8 @@ public class songsFragment extends Fragment {
     private String objectID = "";
     private List<String> keysToInclude = new ArrayList<>();
     private int objectPosition;
+    private String collection = "userSongs";
+    private String field = "songs";
     private Toast toast = null;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -93,6 +95,10 @@ public class songsFragment extends Fragment {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mAdapter);
 
+        songBtn = view.findViewById(R.id.songSearch);
+        albumBtn = view.findViewById(R.id.albumSearch);
+        artistBtn = view.findViewById(R.id.artistSearch);
+        playlistBtn = view.findViewById(R.id.playlistSearch);
         detAdd = view.findViewById(R.id.detailsAdd);
         detDel = view.findViewById(R.id.detailsDel);
         detClose = view.findViewById(R.id.detailsClose);
@@ -110,13 +116,65 @@ public class songsFragment extends Fragment {
         artistSuggest = view.findViewById(R.id.artistSuggest);
         reload = view.findViewById(R.id.reload);
 
-
         reload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 triggerReload();
             }
         });
+
+        songBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                collection = "userSongs";
+                field = "songs";
+                songBtn.setIconTintResource(R.color.glass_red);
+                albumBtn.setIconTintResource(R.color.teal);
+                artistBtn.setIconTintResource(R.color.teal);
+                playlistBtn.setIconTintResource(R.color.teal);
+                triggerReload();
+            }
+        });
+
+        albumBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                collection = "userAlbums";
+                field = "albums";
+                songBtn.setIconTintResource(R.color.teal);
+                albumBtn.setIconTintResource(R.color.glass_red);
+                artistBtn.setIconTintResource(R.color.teal);
+                playlistBtn.setIconTintResource(R.color.teal);
+                triggerReload();
+            }
+        });
+
+        artistBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                collection = "userArtists";
+                field = "artists";
+                songBtn.setIconTintResource(R.color.teal);
+                albumBtn.setIconTintResource(R.color.teal);
+                artistBtn.setIconTintResource(R.color.glass_red);
+                playlistBtn.setIconTintResource(R.color.teal);
+                triggerReload();
+            }
+        });
+
+        playlistBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                collection = "userPlaylists";
+                field = "playlists";
+                songBtn.setIconTintResource(R.color.teal);
+                albumBtn.setIconTintResource(R.color.teal);
+                artistBtn.setIconTintResource(R.color.teal);
+                playlistBtn.setIconTintResource(R.color.glass_red);
+                triggerReload();
+            }
+        });
+
         detClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -136,6 +194,36 @@ public class songsFragment extends Fragment {
             public void onClick(View v) {
                 if (objectID != null && !objectID.isEmpty()) {
                     JSONObject jsonObject = searchResult.get(objectPosition);
+                    String collection = null;
+                    String field = null;
+                    String type = null;
+                    try {
+                        type = jsonObject.getString("type");
+                    } catch (JSONException e) {
+                        Log.d(TAG, "Error retrieving object type, ",e);
+                    };
+
+                    switch (type) {
+                        case "song":
+                            collection = "userSongs";
+                            field = "songs";
+                            break;
+
+                        case "album":
+                            collection = "userAlbums";
+                            field = "albums";
+                            break;
+
+                        case "artist":
+                            collection = "userArtists";
+                            field = "artists";
+                            break;
+
+                        case "playlist":
+                            collection = "userPlaylists";
+                            field = "playlists";
+                            break;
+                    }
                     String jsonString = jsonObject.toString();
                     loadingAnimation.setVisibility(View.VISIBLE);
                     FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -143,19 +231,20 @@ public class songsFragment extends Fragment {
 
                     if (currentUser != null) {
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        DocumentReference userDocRef = db.collection("users").document(currentUser.getUid());
+                        DocumentReference userDocRef = db.collection(collection).document(currentUser.getUid());
+                        String finalField = field;
                         userDocRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                             @Override
                             public void onSuccess(DocumentSnapshot documentSnapshot) {
                                 if (documentSnapshot.exists()) {
-                                    List<String> currentSongs = (List<String>) documentSnapshot.get("userSongs");
+                                    List<String> currentSongs = (List<String>) documentSnapshot.get(finalField);
                                     if (currentSongs == null) {
                                         currentSongs = new ArrayList<>();
                                     }
                                     if (!currentSongs.contains(jsonString)) {
                                         currentSongs.add(jsonString);
                                         Map<String, Object> updates = new HashMap<>();
-                                        updates.put("userSongs", currentSongs);
+                                        updates.put(finalField, currentSongs);
                                         userDocRef.update(updates)
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
@@ -163,7 +252,7 @@ public class songsFragment extends Fragment {
                                                         if (toast != null)
                                                             toast.cancel();
                                                         Log.d(TAG, "ObjectID added to Firestore songs array successfully!");
-                                                        toast = Toast.makeText(requireContext(), "Added song to user's list", Toast.LENGTH_SHORT);
+                                                        toast = Toast.makeText(requireContext(), "Added to user's list", Toast.LENGTH_SHORT);
                                                         toast.show();
                                                         loadingAnimation.setVisibility(View.GONE);
                                                     }
@@ -174,7 +263,7 @@ public class songsFragment extends Fragment {
                                                         if (toast != null)
                                                             toast.cancel();
                                                         Log.e(TAG, "Error updating document", e);
-                                                        toast = Toast.makeText(requireContext(), "Error while adding song", Toast.LENGTH_SHORT);
+                                                        toast = Toast.makeText(requireContext(), "Error while adding", Toast.LENGTH_SHORT);
                                                         toast.show();
                                                         loadingAnimation.setVisibility(View.GONE);
                                                     }
@@ -182,8 +271,8 @@ public class songsFragment extends Fragment {
                                     } else {
                                         if (toast != null)
                                             toast.cancel();
-                                        Log.d(TAG, "ObjectID already exists in Firestore songs array!");
-                                        toast = Toast.makeText(requireContext(), "Song is already present on user's list", Toast.LENGTH_SHORT);
+                                        Log.d(TAG, "ObjectID already exists");
+                                        toast = Toast.makeText(requireContext(), "Already present on user's list", Toast.LENGTH_SHORT);
                                         toast.show();
                                         loadingAnimation.setVisibility(View.GONE);
                                     }
@@ -217,13 +306,12 @@ public class songsFragment extends Fragment {
                 } else {
                     if (toast != null)
                         toast.cancel();
-                    toast = Toast.makeText(requireContext(), "Song id null", Toast.LENGTH_SHORT);
+                    toast = Toast.makeText(requireContext(), "Object id null", Toast.LENGTH_SHORT);
                     toast.show();
                     loadingAnimation.setVisibility(View.GONE);
                 }
             }
         });
-
 
         detDel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -233,43 +321,84 @@ public class songsFragment extends Fragment {
                     FirebaseAuth mAuth = FirebaseAuth.getInstance();
                     FirebaseUser currentUser = mAuth.getCurrentUser();
 
+                    JSONObject jsonObject = searchResult.get(objectPosition);
+                    String jsonString = jsonObject.toString();
+                    String collection = null;
+                    String field = null;
+                    String type = null;
+                    try {
+                        type = jsonObject.getString("type");
+                    } catch (JSONException e) {
+                        Log.d(TAG, "Error retrieving object type, ",e);
+                    };
+
+                    switch (type) {
+                        case "song":
+                            collection = "userSongs";
+                            field = "songs";
+                            break;
+
+                        case "album":
+                            collection = "userAlbums";
+                            field = "albums";
+                            break;
+
+                        case "artist":
+                            collection = "userArtists";
+                            field = "artists";
+                            break;
+
+                        case "playlist":
+                            collection = "userPlaylists";
+                            field = "playlists";
+                            break;
+                    }
+
                     if (currentUser != null) {
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        DocumentReference userDocRef = db.collection("users").document(currentUser.getUid());
+                        DocumentReference userDocRef = db.collection(collection).document(currentUser.getUid());
+                        String finalField = field;
                         userDocRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                             @Override
                             public void onSuccess(DocumentSnapshot documentSnapshot) {
                                 if (documentSnapshot.exists()) {
-                                    List<String> currentSongs = (List<String>) documentSnapshot.get("userSongs");
+                                    List<String> currentSongs = (List<String>) documentSnapshot.get(finalField);
                                     if (currentSongs == null) {
                                         currentSongs = new ArrayList<>();
                                     }
-                                    currentSongs.remove(objectPosition);
-                                    Map<String, Object> updates = new HashMap<>();
-                                    updates.put("userSongs", currentSongs);
-                                    userDocRef.update(updates)
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    if (toast != null)
-                                                        toast.cancel();
-                                                    Log.d(TAG, "ObjectID removed from Firestore songs array successfully!");
-                                                    toast = Toast.makeText(requireContext(), "Removed song from user's list", Toast.LENGTH_SHORT);
-                                                    toast.show();
-                                                    loadingAnimation.setVisibility(View.GONE);
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    if (toast != null)
-                                                        toast.cancel();
-                                                    Log.e(TAG, "Error updating document", e);
-                                                    toast = Toast.makeText(requireContext(), "Error while removing song", Toast.LENGTH_SHORT);
-                                                    toast.show();
-                                                    loadingAnimation.setVisibility(View.GONE);
-                                                }
-                                            });
+                                    if (!currentSongs.contains(jsonString)){
+                                        if (toast != null)
+                                            toast.cancel();
+                                        Log.d(TAG, "ObjectID not found it user's list");
+                                        toast = Toast.makeText(requireContext(), "Item is not in user's list", Toast.LENGTH_SHORT);
+                                        toast.show();
+                                    } else {
+                                        currentSongs.remove(jsonString);
+                                        Map<String, Object> updates = new HashMap<>();
+                                        updates.put(finalField, currentSongs);
+                                        userDocRef.update(updates)
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        if (toast != null)
+                                                            toast.cancel();
+                                                        Log.d(TAG, "ObjectID removed from Firestore songs array successfully!");
+                                                        toast = Toast.makeText(requireContext(), "Removed from user's list", Toast.LENGTH_SHORT);
+                                                        toast.show();
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        if (toast != null)
+                                                            toast.cancel();
+                                                        Log.e(TAG, "Error updating document", e);
+                                                        toast = Toast.makeText(requireContext(), "Error while removing", Toast.LENGTH_SHORT);
+                                                        toast.show();
+                                                    }
+                                                });
+                                    }
+                                    loadingAnimation.setVisibility(View.GONE);
                                 } else {
                                     if (toast != null)
                                         toast.cancel();
@@ -300,7 +429,7 @@ public class songsFragment extends Fragment {
                 } else {
                     if (toast != null)
                         toast.cancel();
-                    toast = Toast.makeText(requireContext(), "Song id null", Toast.LENGTH_SHORT);
+                    toast = Toast.makeText(requireContext(), "Object id null", Toast.LENGTH_SHORT);
                     toast.show();
                     loadingAnimation.setVisibility(View.GONE);
                 }
@@ -327,13 +456,13 @@ public class songsFragment extends Fragment {
 
             if (currentUser != null) {
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
-                DocumentReference userDocRef = db.collection("users").document(currentUser.getUid());
+                DocumentReference userDocRef = db.collection(params[0]).document(currentUser.getUid());
                 userDocRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         try {
                             if (documentSnapshot.exists()) {
                                 searchResult.clear();
-                                songsList = (List<String>) documentSnapshot.get("userSongs");
+                                songsList = (List<String>) documentSnapshot.get(params[1]);
                                 if (songsList == null) {
                                 } else {
                                     for (String jsonString : songsList) {
@@ -355,9 +484,9 @@ public class songsFragment extends Fragment {
                         } catch (Exception e) {
                             if (toast != null)
                                 toast.cancel();
-                            toast = Toast.makeText(requireContext(), "Error retrieving user songs", Toast.LENGTH_SHORT);
+                            toast = Toast.makeText(requireContext(), "Error retrieving user list", Toast.LENGTH_SHORT);
                             toast.show();
-                            Log.e(TAG, "Error retrieving user songs", e);
+                            Log.e(TAG, "Error retrieving user list", e);
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -388,20 +517,20 @@ public class songsFragment extends Fragment {
                 noResult.setVisibility(View.VISIBLE);
                 if (toast != null)
                     toast.cancel();
-                toast = Toast.makeText(requireContext(), "User's song list is empty", Toast.LENGTH_SHORT);
+                toast = Toast.makeText(requireContext(), "User's list is empty", Toast.LENGTH_SHORT);
                 toast.show();
             } else {
                 mRecyclerView.setVisibility(View.VISIBLE);
                 if (toast != null)
                     toast.cancel();
-                toast = Toast.makeText(requireContext(), "Fetched songs", Toast.LENGTH_SHORT);
+                toast = Toast.makeText(requireContext(), "Fetched user data", Toast.LENGTH_SHORT);
                 toast.show();
             }
         }
     }
 
     public void triggerReload() {
-        new songsFragment.FetchDataTask().execute("");
+        new songsFragment.FetchDataTask().execute(collection, field);
     }
 
     public class FetchSongDataTask extends AsyncTask<String, Void, JSONObject> {
@@ -449,7 +578,7 @@ public class songsFragment extends Fragment {
             try{
                 String tmpString = null, tmpString2 = null;
                 JSONObject objectDetails;
-                if ((Object)songData.get("data") instanceof JSONArray)
+                if ((Object)songData.get("data") instanceof  JSONArray)
                     objectDetails = (JSONObject) songData.getJSONArray("data").get(0);
                 else
                     objectDetails = (JSONObject) songData.getJSONObject("data");
@@ -476,6 +605,44 @@ public class songsFragment extends Fragment {
                     artistList.setVisibility(View.VISIBLE);
                     albumList.setVisibility(View.VISIBLE);
                     detAdd.setVisibility(View.VISIBLE);
+                    detDel.setVisibility(View.VISIBLE);
+                } else if (objectDetails.getString("type").equals("artist")) {
+                    if (objectDetails.has("fanCount")) {
+                        tmpString = objectDetails.getString("fanCount");
+                        tmpString2 = objectDetails.getString("followerCount");
+                        if (Integer.valueOf(tmpString) > Integer.valueOf(tmpString2))
+                            detInfo.setText("Fans: " + tmpString);
+                        else
+                            detInfo.setText("Followers: " + tmpString2);
+                    } else
+                        detInfo.setText("null");
+                    songList.setVisibility(View.VISIBLE);
+                    albumList.setVisibility(View.VISIBLE);
+                    artistSuggest.setVisibility(View.VISIBLE);
+                    detAdd.setVisibility(View.VISIBLE);
+                    detDel.setVisibility(View.VISIBLE);
+                } else if (objectDetails.getString("type").equals("album")) {
+                    if (objectDetails.has("description")) {
+                        tmpString2 = objectDetails.getString("description");
+                        detInfo.setText(tmpString2);
+                    } else if (objectDetails.has("artists")) {
+                        if (objectDetails.getJSONObject("artists").has("primary"))
+                            tmpString = objectDetails.getJSONObject("artists").getJSONArray("primary").getJSONObject(0).getString("name");
+                        detInfo.setText(tmpString);
+                    } else
+                        detInfo.setText("null");
+                    songList.setVisibility(View.VISIBLE);
+                    artistList.setVisibility(View.VISIBLE);
+                    detAdd.setVisibility(View.VISIBLE);
+                    detDel.setVisibility(View.VISIBLE);
+                } else if (objectDetails.getString("type").equals("playlist")) {
+                    if (objectDetails.has("description"))
+                        detInfo.setText(objectDetails.getString("description"));
+                    else
+                        detInfo.setText("null");
+                    songList.setVisibility(View.VISIBLE);
+                    detAdd.setVisibility(View.VISIBLE);
+                    detDel.setVisibility(View.VISIBLE);
                 }
                 if (objectDetails.has("name"))
                     detName.setText(objectDetails.getString("name"));
