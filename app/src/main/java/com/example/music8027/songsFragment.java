@@ -240,10 +240,6 @@ public class songsFragment extends Fragment {
                                 searchResult.clear();
                                 songsList = (List<String>) documentSnapshot.get("userSongs");
                                 if (songsList == null) {
-                                    if (toast != null)
-                                        toast.cancel();
-                                    toast = Toast.makeText(requireContext(), "User's song list is empty", Toast.LENGTH_SHORT);
-                                    toast.show();
                                 } else {
                                     for (String jsonString : songsList) {
                                         try {
@@ -295,13 +291,17 @@ public class songsFragment extends Fragment {
             loadingAnimation.setVisibility(View.GONE);
             if (searchResult.isEmpty()) {
                 noResult.setVisibility(View.VISIBLE);
+                if (toast != null)
+                    toast.cancel();
+                toast = Toast.makeText(requireContext(), "User's song list is empty", Toast.LENGTH_SHORT);
+                toast.show();
             } else {
                 mRecyclerView.setVisibility(View.VISIBLE);
+                if (toast != null)
+                    toast.cancel();
+                toast = Toast.makeText(requireContext(), "Fetched songs", Toast.LENGTH_SHORT);
+                toast.show();
             }
-            if (toast != null)
-                toast.cancel();
-            toast = Toast.makeText(requireContext(), "Fetched songs", Toast.LENGTH_SHORT);
-            toast.show();
         }
     }
 
