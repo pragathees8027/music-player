@@ -63,8 +63,7 @@ public class songsFragment extends Fragment {
     private String objectID = "";
     private List<String> keysToInclude = new ArrayList<>();
     private int objectPosition;
-    private String collection = "userSongs";
-    private String field = "songs";
+    private String collection = "userSongs", searchSpecifier = "", field = "songs";
     private Toast toast = null;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -89,14 +88,33 @@ public class songsFragment extends Fragment {
             }
         });
 
-        mAdapter = new RecyclerAdapter(getContext(), viewItems, "/songs", new RecyclerAdapter.OnItemClickListener() {
+        mAdapter = new RecyclerAdapter(getContext(), viewItems, searchSpecifier, new RecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) throws JSONException {
                 objectPosition = position;
                 objectID = searchResult.get(position).getString("id");
-                String objectUrl = "https://saavn.dev/api/songs/" + objectID;
+                String type = searchResult.get(position).getString("type");;
+                String searchSpec = null;
+                switch (type) {
+                    case "song":
+                        searchSpec = "songs/";
+                        break;
+
+                    case "album":
+                        searchSpec = "albums?id=";
+                        break;
+
+                    case "artist":
+                        searchSpec = "artists/";
+                        break;
+
+                    case "playlist":
+                        searchSpec = "playlists?id=";
+                        break;
+                }
+                String objectUrl = "https://saavn.dev/api/" + searchSpec + objectID;
                 Log.e(TAG, objectUrl);
-                new songsFragment.FetchSongDataTask().execute(objectUrl);
+                new FetchSongDataTask().execute(objectUrl);
             }
         });
 
@@ -548,7 +566,6 @@ public class songsFragment extends Fragment {
     }
 
     public class FetchSongDataTask extends AsyncTask<String, Void, JSONObject> {
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -560,7 +577,7 @@ public class songsFragment extends Fragment {
 
         @Override
         protected JSONObject doInBackground(String... params) {
-            JSONObject songData = new JSONObject();
+            JSONObject songData = null;
             try {
                 String objectUrlString = params[0];
                 URL objectUrl = new URL(objectUrlString);
@@ -624,7 +641,7 @@ public class songsFragment extends Fragment {
                     if (objectDetails.has("fanCount")) {
                         tmpString = objectDetails.getString("fanCount");
                         tmpString2 = objectDetails.getString("followerCount");
-                        if (Integer.valueOf(tmpString) > Integer.valueOf(tmpString2))
+                        if (Integer.valueOf(tmpString) > Integer.parseInt(tmpString2))
                             detInfo.setText("Fans: " + tmpString);
                         else
                             detInfo.setText("Followers: " + tmpString2);
@@ -673,7 +690,6 @@ public class songsFragment extends Fragment {
             }
         }
     }
-
     public String convertJsonToString(JSONObject jsonObject, List<String> keyList) {
         StringBuilder stringBuilder = new StringBuilder();
 
