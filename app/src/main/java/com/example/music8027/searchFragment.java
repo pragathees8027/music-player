@@ -52,7 +52,7 @@ public class searchFragment extends Fragment {
     private RecyclerView.LayoutManager layoutManager;
     private GridLayoutManager gridLayoutManager;
     private EditText searchSong;
-    private TextView detName, detInfo, fullText;
+    private TextView detName, detInfo, fullText, header;
     private ImageView detImg;
     private static final String TAG = "searchFragment";
     private String songName = null;
@@ -65,6 +65,7 @@ public class searchFragment extends Fragment {
     private List<String> keysToInclude = new ArrayList<>();
     private int objectPosition;
     private Toast toast = null;
+    private String headerString = "Top results";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -146,10 +147,12 @@ public class searchFragment extends Fragment {
         artistList = view.findViewById(R.id.artistList);
         songSuggest = view.findViewById(R.id.songSuggest);
         artistSuggest = view.findViewById(R.id.artistSuggest);
+        header = view.findViewById(R.id.home);
 
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                header.setText(headerString);
                 triggerSearch();
             }
         });
@@ -158,6 +161,8 @@ public class searchFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 searchSpecifier = "";
+                headerString = "Top results";
+                header.setText(headerString);
                 topBtn.setIconTintResource(R.color.glass_red);
                 songBtn.setIconTintResource(R.color.teal);
                 albumBtn.setIconTintResource(R.color.teal);
@@ -171,6 +176,8 @@ public class searchFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 searchSpecifier = "/songs";
+                headerString = "Songs";
+                header.setText(headerString);
                 topBtn.setIconTintResource(R.color.teal);
                 songBtn.setIconTintResource(R.color.glass_red);
                 albumBtn.setIconTintResource(R.color.teal);
@@ -184,6 +191,8 @@ public class searchFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 searchSpecifier = "/albums";
+                headerString = "Albums";
+                header.setText(headerString);
                 topBtn.setIconTintResource(R.color.teal);
                 songBtn.setIconTintResource(R.color.teal);
                 albumBtn.setIconTintResource(R.color.glass_red);
@@ -197,6 +206,8 @@ public class searchFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 searchSpecifier = "/artists";
+                headerString = "Artists";
+                header.setText(headerString);
                 topBtn.setIconTintResource(R.color.teal);
                 songBtn.setIconTintResource(R.color.teal);
                 albumBtn.setIconTintResource(R.color.teal);
@@ -210,6 +221,8 @@ public class searchFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 searchSpecifier = "/playlists";
+                headerString = "Playlists";
+                header.setText(headerString);
                 topBtn.setIconTintResource(R.color.teal);
                 songBtn.setIconTintResource(R.color.teal);
                 albumBtn.setIconTintResource(R.color.teal);

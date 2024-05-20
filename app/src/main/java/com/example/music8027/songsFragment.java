@@ -58,7 +58,7 @@ public class songsFragment extends Fragment {
     private MaterialButton songBtn, albumBtn, artistBtn, playlistBtn, detAdd, detDel, detClose, songList, songSuggest, albumList, artistList, artistSuggest, reload;
     private LottieAnimationView loadingAnimation, noResult;
     private MaterialCardView detCard;
-    private TextView detName, detInfo, fullText;
+    private TextView detName, detInfo, fullText, header;
     private ImageView detImg;
     private String objectID = "";
     private List<String> keysToInclude = new ArrayList<>();
@@ -77,7 +77,16 @@ public class songsFragment extends Fragment {
         gridLayoutManager = new GridLayoutManager(getContext(), 2);
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
-            public int getSpanSize(int position) {return 2;}
+            public int getSpanSize(int position) {
+                try {
+                    JSONObject searchItem = searchResult.get(position);
+                    if (searchItem.getString("type").equals("song"))
+                        return 2;
+                    return 1;
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         });
 
         mAdapter = new RecyclerAdapter(getContext(), viewItems, "/songs", new RecyclerAdapter.OnItemClickListener() {
@@ -115,6 +124,7 @@ public class songsFragment extends Fragment {
         songSuggest = view.findViewById(R.id.songSuggest);
         artistSuggest = view.findViewById(R.id.artistSuggest);
         reload = view.findViewById(R.id.reload);
+        header = view.findViewById(R.id.home);
 
         reload.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,6 +138,7 @@ public class songsFragment extends Fragment {
             public void onClick(View v) {
                 collection = "userSongs";
                 field = "songs";
+                header.setText(Character.toUpperCase(field.charAt(0)) + field.substring(1));
                 songBtn.setIconTintResource(R.color.glass_red);
                 albumBtn.setIconTintResource(R.color.teal);
                 artistBtn.setIconTintResource(R.color.teal);
@@ -141,6 +152,7 @@ public class songsFragment extends Fragment {
             public void onClick(View v) {
                 collection = "userAlbums";
                 field = "albums";
+                header.setText(Character.toUpperCase(field.charAt(0)) + field.substring(1));
                 songBtn.setIconTintResource(R.color.teal);
                 albumBtn.setIconTintResource(R.color.glass_red);
                 artistBtn.setIconTintResource(R.color.teal);
@@ -154,6 +166,7 @@ public class songsFragment extends Fragment {
             public void onClick(View v) {
                 collection = "userArtists";
                 field = "artists";
+                header.setText(Character.toUpperCase(field.charAt(0)) + field.substring(1));
                 songBtn.setIconTintResource(R.color.teal);
                 albumBtn.setIconTintResource(R.color.teal);
                 artistBtn.setIconTintResource(R.color.glass_red);
@@ -167,6 +180,7 @@ public class songsFragment extends Fragment {
             public void onClick(View v) {
                 collection = "userPlaylists";
                 field = "playlists";
+                header.setText(Character.toUpperCase(field.charAt(0)) + field.substring(1));
                 songBtn.setIconTintResource(R.color.teal);
                 albumBtn.setIconTintResource(R.color.teal);
                 artistBtn.setIconTintResource(R.color.teal);
