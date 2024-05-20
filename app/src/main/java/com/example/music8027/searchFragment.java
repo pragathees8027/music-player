@@ -64,6 +64,7 @@ public class searchFragment extends Fragment {
     private MaterialButtonToggleGroup searchToggle;
     private List<String> keysToInclude = new ArrayList<>();
     private int objectPosition;
+    private Toast toast = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -262,44 +263,65 @@ public class searchFragment extends Fragment {
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
+                                                        if (toast != null)
+                                                            toast.cancel();
                                                         Log.d(TAG, "ObjectID added to Firestore songs array successfully!");
-                                                        Toast.makeText(requireContext(), "Added song to user's list", Toast.LENGTH_SHORT).show();
+                                                        toast = Toast.makeText(requireContext(), "Added song to user's list", Toast.LENGTH_SHORT);
+                                                        toast.show();
                                                         loadingAnimation.setVisibility(View.GONE);
                                                     }
                                                 })
                                                 .addOnFailureListener(new OnFailureListener() {
                                                     @Override
                                                     public void onFailure(@NonNull Exception e) {
+                                                        if (toast != null)
+                                                            toast.cancel();
                                                         Log.e(TAG, "Error updating document", e);
-                                                        Toast.makeText(requireContext(), "Error while adding song", Toast.LENGTH_SHORT).show();
+                                                        toast = Toast.makeText(requireContext(), "Error while adding song", Toast.LENGTH_SHORT);
+                                                        toast.show();
                                                         loadingAnimation.setVisibility(View.GONE);
                                                     }
                                                 });
                                     } else {
+                                        if (toast != null)
+                                            toast.cancel();
                                         Log.d(TAG, "ObjectID already exists in Firestore songs array!");
-                                        Toast.makeText(requireContext(), "Song is already present on user's list", Toast.LENGTH_SHORT).show();
+                                        toast = Toast.makeText(requireContext(), "Song is already present on user's list", Toast.LENGTH_SHORT);
+                                        toast.show();
                                         loadingAnimation.setVisibility(View.GONE);
                                     }
                                 } else {
+                                    if (toast != null)
+                                        toast.cancel();
                                     Log.d(TAG, "Document does not exist");
-                                    Toast.makeText(requireContext(), "Firestore db error", Toast.LENGTH_SHORT).show();
+                                    toast = Toast.makeText(requireContext(), "Firestore db error", Toast.LENGTH_SHORT);
+                                    toast.show();
                                     loadingAnimation.setVisibility(View.GONE);
                                 }
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
+                                if (toast != null)
+                                    toast.cancel();
                                 Log.e(TAG, "Error fetching document", e);
-                                Toast.makeText(requireContext(), "Error fetching user's list", Toast.LENGTH_SHORT).show();
+                                toast = Toast.makeText(requireContext(), "Error fetching user's list", Toast.LENGTH_SHORT);
+                                toast.show();
                                 loadingAnimation.setVisibility(View.GONE);
                             }
                         });
                     } else {
-                        Toast.makeText(requireContext(), "User not logged in", Toast.LENGTH_SHORT).show();
+                        if (toast != null)
+                            toast.cancel();
+                        toast = Toast.makeText(requireContext(), "User not logged in", Toast.LENGTH_SHORT);
+                        toast.show();
                         loadingAnimation.setVisibility(View.GONE);
                     }
                 } else {
-                    Toast.makeText(requireContext(), "Song id null", Toast.LENGTH_SHORT).show();
+                    if (toast != null)
+                        toast.cancel();
+                    toast = Toast.makeText(requireContext(), "Song id null", Toast.LENGTH_SHORT);
+                    toast.show();
                     loadingAnimation.setVisibility(View.GONE);
                 }
             }

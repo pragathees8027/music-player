@@ -37,6 +37,7 @@ public class SignUpActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private LottieAnimationView loadingAnimation;
     private MaterialButtonToggleGroup toggleGroup;
+    private  Toast toast = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,19 +96,28 @@ public class SignUpActivity extends AppCompatActivity {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> verificationTask) {
                                             if (verificationTask.isSuccessful()) {
-                                                Toast.makeText(SignUpActivity.this, "Verification email sent", Toast.LENGTH_SHORT).show();
+                                                if (toast != null)
+                                                    toast.cancel();
+                                                toast = Toast.makeText(SignUpActivity.this, "Verification email sent", Toast.LENGTH_SHORT);
+                                                toast.show();
                                                 toggleGroup.setVisibility(View.GONE);
                                                 loadingAnimation.setVisibility(View.VISIBLE);
                                                 checkEmailVerificationStatus();
                                             } else {
-                                                Toast.makeText(SignUpActivity.this, "Failed to send verification email", Toast.LENGTH_SHORT).show();
+                                                if (toast != null)
+                                                    toast.cancel();
+                                                toast = Toast.makeText(SignUpActivity.this, "Failed to send verification email", Toast.LENGTH_SHORT);
+                                                toast.show();
                                                 toggleGroup.setVisibility(View.VISIBLE);
                                                 loadingAnimation.setVisibility(View.GONE);
                                             }
                                         }
                                     });
                         } else {
-                            Toast.makeText(SignUpActivity.this, "Failed to create account. Please try again", Toast.LENGTH_SHORT).show();
+                            if (toast != null)
+                                toast.cancel();
+                            toast = Toast.makeText(SignUpActivity.this, "Failed to create account. Please try again", Toast.LENGTH_SHORT);
+                            toast.show();
                             toggleGroup.setVisibility(View.VISIBLE);
                             loadingAnimation.setVisibility(View.GONE);
                         }
@@ -145,15 +155,21 @@ public class SignUpActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Toast.makeText(SignUpActivity.this, "Sign up successful", Toast.LENGTH_SHORT).show();
+                            if (toast != null)
+                                toast.cancel();
+                            toast = Toast.makeText(SignUpActivity.this, "Sign up successful", Toast.LENGTH_SHORT);
+                            toast.show();
                             Log.d(TAG, "User details added to Firestore");
                             Intent i = new Intent(SignUpActivity.this, LoginActivity.class);
                             startActivity(i);
                             overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
                             finish();
                         } else {
+                            if (toast != null)
+                                toast.cancel();
                             Log.w(TAG, "Error adding user details to Firestore", task.getException());
-                            Toast.makeText(SignUpActivity.this, "Error adding user details to Firestore", Toast.LENGTH_SHORT).show();
+                            toast = Toast.makeText(SignUpActivity.this, "Error adding user details to Firestore", Toast.LENGTH_SHORT);
+                            toast.show();
                             toggleGroup.setVisibility(View.VISIBLE);
                             loadingAnimation.setVisibility(View.GONE);
                         }

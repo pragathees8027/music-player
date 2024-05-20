@@ -62,6 +62,8 @@ public class songsFragment extends Fragment {
     private ImageView detImg;
     private String objectID = "";
     private List<String> keysToInclude = new ArrayList<>();
+    private int objectPosition;
+    private Toast toast = null;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -79,6 +81,7 @@ public class songsFragment extends Fragment {
         mAdapter = new RecyclerAdapter(getContext(), viewItems, "/songs", new RecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) throws JSONException {
+                objectPosition = position;
                 objectID = searchResult.get(position).getString("id");
                 String objectUrl = "https://saavn.dev/api/songs/" + objectID;
                 Log.e(TAG, objectUrl);
@@ -110,7 +113,7 @@ public class songsFragment extends Fragment {
         reload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new songsFragment.FetchDataTask().execute("");
+                triggerReload();
             }
         });
         detClose.setOnClickListener(new View.OnClickListener() {
@@ -123,6 +126,7 @@ public class songsFragment extends Fragment {
                 songList.setVisibility(View.GONE);
                 detCard.setVisibility(View.GONE);
                 mRecyclerView.setVisibility(View.VISIBLE);
+                triggerReload();
             }
         });
 
@@ -145,52 +149,70 @@ public class songsFragment extends Fragment {
                                     if (currentSongs == null) {
                                         currentSongs = new ArrayList<>();
                                     }
-                                    currentSongs.remove(objectID);
+                                    currentSongs.remove(objectPosition);
                                     Map<String, Object> updates = new HashMap<>();
                                     updates.put("userSongs", currentSongs);
                                     userDocRef.update(updates)
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
+                                                    if (toast != null)
+                                                        toast.cancel();
                                                     Log.d(TAG, "ObjectID removed from Firestore songs array successfully!");
-                                                    Toast.makeText(requireContext(), "Removed song from user's list", Toast.LENGTH_SHORT).show();
+                                                    toast = Toast.makeText(requireContext(), "Removed song from user's list", Toast.LENGTH_SHORT);
+                                                    toast.show();
                                                     loadingAnimation.setVisibility(View.GONE);
                                                 }
                                             })
                                             .addOnFailureListener(new OnFailureListener() {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
+                                                    if (toast != null)
+                                                        toast.cancel();
                                                     Log.e(TAG, "Error updating document", e);
-                                                    Toast.makeText(requireContext(), "Error while removing song", Toast.LENGTH_SHORT).show();
+                                                    toast = Toast.makeText(requireContext(), "Error while removing song", Toast.LENGTH_SHORT);
+                                                    toast.show();
                                                     loadingAnimation.setVisibility(View.GONE);
                                                 }
                                             });
                                 } else {
+                                    if (toast != null)
+                                        toast.cancel();
                                     Log.d(TAG, "Document does not exist");
-                                    Toast.makeText(requireContext(), "Firestore db error", Toast.LENGTH_SHORT).show();
+                                    toast = Toast.makeText(requireContext(), "Firestore db error", Toast.LENGTH_SHORT);
+                                    toast.show();
                                     loadingAnimation.setVisibility(View.GONE);
                                 }
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
+                                if (toast != null)
+                                    toast.cancel();
                                 Log.e(TAG, "Error fetching document", e);
-                                Toast.makeText(requireContext(), "Error fetching user's list", Toast.LENGTH_SHORT).show();
+                                toast = Toast.makeText(requireContext(), "Error fetching user's list", Toast.LENGTH_SHORT);
+                                toast.show();
                                 loadingAnimation.setVisibility(View.GONE);
                             }
                         });
                     } else {
-                        Toast.makeText(requireContext(), "User not logged in", Toast.LENGTH_SHORT).show();
+                        if (toast != null)
+                            toast.cancel();
+                        toast = Toast.makeText(requireContext(), "User not logged in", Toast.LENGTH_SHORT);
+                        toast.show();
                         loadingAnimation.setVisibility(View.GONE);
                     }
                 } else {
-                    Toast.makeText(requireContext(), "Song id null", Toast.LENGTH_SHORT).show();
+                    if (toast != null)
+                        toast.cancel();
+                    toast = Toast.makeText(requireContext(), "Song id null", Toast.LENGTH_SHORT);
+                    toast.show();
                     loadingAnimation.setVisibility(View.GONE);
                 }
             }
         });
 
-        fetchData();
+        triggerReload();
         return view;
     }
 
@@ -218,7 +240,10 @@ public class songsFragment extends Fragment {
                                 searchResult.clear();
                                 songsList = (List<String>) documentSnapshot.get("userSongs");
                                 if (songsList == null) {
-                                    Toast.makeText(requireContext(), "User's song list is empty", Toast.LENGTH_SHORT).show();
+                                    if (toast != null)
+                                        toast.cancel();
+                                    toast = Toast.makeText(requireContext(), "User's song list is empty", Toast.LENGTH_SHORT);
+                                    toast.show();
                                 } else {
                                     for (String jsonString : songsList) {
                                         try {
@@ -228,74 +253,60 @@ public class songsFragment extends Fragment {
                                             e.printStackTrace();
                                         }
                                     }
+                                    updateRecyclerView(searchResult);
                                 }
                             } else {
-                                Toast.makeText(requireContext(), "User data doesn't exist", Toast.LENGTH_SHORT).show();
+                                if (toast != null)
+                                    toast.cancel();
+                                toast = Toast.makeText(requireContext(), "User data doesn't exist", Toast.LENGTH_SHORT);
+                                toast.show();
                             }
                         } catch (Exception e) {
-                            Toast.makeText(requireContext(), "Error retrieving user songs", Toast.LENGTH_SHORT).show();
+                            if (toast != null)
+                                toast.cancel();
+                            toast = Toast.makeText(requireContext(), "Error retrieving user songs", Toast.LENGTH_SHORT);
+                            toast.show();
                             Log.e(TAG, "Error retrieving user songs", e);
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(requireContext(), "Error retrieving user data", Toast.LENGTH_SHORT).show();
+                        if (toast != null)
+                            toast.cancel();
+                        toast = Toast.makeText(requireContext(), "Error retrieving user data", Toast.LENGTH_SHORT);
+                        toast.show();
                         Log.e(TAG, "Error retrieving user document", e);
                     }
                 });
             } else {
-                Toast.makeText(requireContext(), "No user logged in", Toast.LENGTH_SHORT).show();
+                if (toast != null)
+                    toast.cancel();
+                toast = Toast.makeText(requireContext(), "No user logged in", Toast.LENGTH_SHORT);
+                toast.show();
             }
             return searchResult;
         }
 
-        @Override
-        protected void onPostExecute(ArrayList<JSONObject> searchResult) {
+        private void updateRecyclerView(ArrayList<JSONObject> searchResult) {
             viewItems.clear();
             viewItems.addAll(searchResult);
             mAdapter.notifyDataSetChanged();
             loadingAnimation.setVisibility(View.GONE);
-            if (searchResult.isEmpty())
+            if (searchResult.isEmpty()) {
                 noResult.setVisibility(View.VISIBLE);
-            else
+            } else {
                 mRecyclerView.setVisibility(View.VISIBLE);
-            Toast.makeText(requireContext(), "Fetched songs", Toast.LENGTH_SHORT).show();
+            }
+            if (toast != null)
+                toast.cancel();
+            toast = Toast.makeText(requireContext(), "Fetched songs", Toast.LENGTH_SHORT);
+            toast.show();
         }
     }
 
-    public void fetchData() {
-        searchResult = new ArrayList<>();
-
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-
-        if (currentUser != null) {
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-            DocumentReference userDocRef = db.collection("users").document(currentUser.getUid());
-            userDocRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                    try {
-                        if (documentSnapshot.exists()) {
-                            searchResult.clear();
-                            List<String> songsList = (List<String>) documentSnapshot.get("userSongs");
-                            if (songsList != null) {
-                                for (String jsonString : songsList) {
-                                    try {
-                                        JSONObject jsonObject = new JSONObject(jsonString);
-                                        searchResult.add(jsonObject);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-                        }
-                    } catch (Exception e) {
-                        Log.e(TAG, "Error retrieving user songs", e);
-                    }
-                }
-            });
-        }
+    public void triggerReload() {
+        new songsFragment.FetchDataTask().execute("");
     }
 
     public class FetchSongDataTask extends AsyncTask<String, Void, JSONObject> {

@@ -119,7 +119,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (mBackPressed + 300 > System.currentTimeMillis()) {
-            Toast.makeText(getBaseContext(), "App closed", Toast.LENGTH_SHORT).show();
+            if (toast != null)
+                toast.cancel();
+            toast = Toast.makeText(getBaseContext(), "App closed", Toast.LENGTH_SHORT);
+            toast.show();
             finish();
         }
         super.onBackPressed();

@@ -32,7 +32,7 @@ public class settingsFragment extends Fragment {
     FirebaseUser currentUser;
     private FirebaseFirestore db;
     private LottieAnimationView loadingAnimation;
-
+    private Toast toast = null;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -92,14 +92,21 @@ public class settingsFragment extends Fragment {
         String confirmPassword = editTextConfirmPassword.getText().toString().trim();
 
         if (name.isEmpty() || email.isEmpty()) {
-            Toast.makeText(getActivity(), "Name and Email are required fields", Toast.LENGTH_SHORT).show();
+
+            if (toast != null)
+                toast.cancel();
+            toast = Toast.makeText(getActivity(), "Name and Email are required fields", Toast.LENGTH_SHORT);
+            toast.show();
             return;
         }
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             if (!password.isEmpty() && !password.equals(confirmPassword)) {
-                Toast.makeText(getActivity(), "Passwords do not match", Toast.LENGTH_SHORT).show();
+                if (toast != null)
+                    toast.cancel();
+                toast = Toast.makeText(getActivity(), "Passwords do not match", Toast.LENGTH_SHORT);
+                toast.show();
                 return;
             }
 
@@ -110,19 +117,31 @@ public class settingsFragment extends Fragment {
                                 currentUser.updatePassword(password)
                                         .addOnCompleteListener(passwordUpdateTask -> {
                                             if (passwordUpdateTask.isSuccessful()) {
-                                                Toast.makeText(getActivity(), "Password updated successfully", Toast.LENGTH_SHORT).show();
+                                                if (toast != null)
+                                                    toast.cancel();
+                                                toast = Toast.makeText(getActivity(), "Password updated successfully", Toast.LENGTH_SHORT);
+                                                toast.show();
                                             } else {
-                                                Toast.makeText(getActivity(), "Failed to update password: " + passwordUpdateTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                                if (toast != null)
+                                                    toast.cancel();
+                                                toast = Toast.makeText(getActivity(), "Failed to update password: " + passwordUpdateTask.getException().getMessage(), Toast.LENGTH_SHORT);
+                                                toast.show();
                                             }
                                         });
                             }
                             updateUserDocument(name, email);
                         } else {
-                            Toast.makeText(getActivity(), "Failed to update email: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            if (toast != null)
+                                toast.cancel();
+                            toast = Toast.makeText(getActivity(), "Failed to update email: " + task.getException().getMessage(), Toast.LENGTH_SHORT);
+                            toast.show();
                         }
                     });
         } else {
-            Toast.makeText(getActivity(), "No user logged in", Toast.LENGTH_SHORT).show();
+            if (toast != null)
+                toast.cancel();
+            toast = Toast.makeText(getActivity(), "No user logged in", Toast.LENGTH_SHORT);
+            toast.show();
         }
     }
 
@@ -136,11 +155,17 @@ public class settingsFragment extends Fragment {
                 .document(mAuth.getCurrentUser().getUid())
                 .update(user)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getActivity(), "User details updated successfully", Toast.LENGTH_SHORT).show();
+                    if (toast != null)
+                        toast.cancel();
+                    toast  = Toast.makeText(getActivity(), "User details updated successfully", Toast.LENGTH_SHORT);
+                    toast.show();
                 })
                 .addOnFailureListener(e -> {
+                    if (toast != null)
+                        toast.cancel();
                     Log.e(TAG, "Error updating user details: " + e.getMessage());
-                    Toast.makeText(getActivity(), "Failed to update user details", Toast.LENGTH_SHORT).show();
+                    toast = Toast.makeText(getActivity(), "Failed to update user details", Toast.LENGTH_SHORT);
+                    toast.show();
                 });
     }
 
@@ -156,18 +181,30 @@ public class settingsFragment extends Fragment {
                             String email = documentSnapshot.getString("email");
                             editTextName.setText(name);
                             editTextEmail.setText(email);
-                            Toast.makeText(getActivity(), "Fetched user data", Toast.LENGTH_SHORT).show();
+                            if (toast != null)
+                                toast.cancel();
+                            toast = Toast.makeText(getActivity(), "Fetched user data", Toast.LENGTH_SHORT);
+                            toast.show();
                         } else {
+                            if (toast != null)
+                                toast.cancel();
                             Log.d(TAG, "No such document");
-                            Toast.makeText(getActivity(), "Error fetching user data, No such document", Toast.LENGTH_SHORT).show();
+                            toast = Toast.makeText(getActivity(), "Error fetching user data, No such document", Toast.LENGTH_SHORT);
+                            toast.show();
                         }
                     })
                     .addOnFailureListener(e -> {
+                        if (toast != null)
+                            toast.cancel();
                         Log.e(TAG, "Error fetching user data: " + e.getMessage());
-                        Toast.makeText(getActivity(), "Error fetching user data", Toast.LENGTH_SHORT).show();
+                        toast = Toast.makeText(getActivity(), "Error fetching user data", Toast.LENGTH_SHORT);
+                        toast.show();
                     });
         } else {
-            Toast.makeText(getActivity(), "Not logged in", Toast.LENGTH_SHORT).show();
+            if (toast != null)
+                toast.cancel();
+            toast = Toast.makeText(getActivity(), "Not logged in", Toast.LENGTH_SHORT);
+            toast.show();
             Log.d(TAG, "No user logged in");
         }
     }
