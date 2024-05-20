@@ -60,7 +60,7 @@ public class searchFragment extends Fragment {
     private String objectID = "";
     private LottieAnimationView loadingAnimation, noResult;
     private MaterialCardView detCard;
-    private MaterialButton search, topBtn, songBtn, albumBtn, artistBtn, playlistBtn, detAdd, detClose, songList, songSuggest, albumList, artistList, artistSuggest;
+    private MaterialButton search, topBtn, songBtn, albumBtn, artistBtn, playlistBtn, detAdd, detDel, detClose, songList, songSuggest, albumList, artistList, artistSuggest;
     private MaterialButtonToggleGroup searchToggle;
     private List<String> keysToInclude = new ArrayList<>();
     private int objectPosition;
@@ -131,6 +131,7 @@ public class searchFragment extends Fragment {
         artistBtn = view.findViewById(R.id.artistSearch);
         playlistBtn = view.findViewById(R.id.playlistSearch);
         detAdd = view.findViewById(R.id.detailsAdd);
+        detDel = view.findViewById(R.id.detailsDel);
         detClose = view.findViewById(R.id.detailsClose);
         searchSong = view.findViewById(R.id.search_input);
         detImg = view.findViewById(R.id.detailsImg);
@@ -327,6 +328,88 @@ public class searchFragment extends Fragment {
             }
         });
 
+        detDel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (objectID != null && !objectID.isEmpty()) {
+                    loadingAnimation.setVisibility(View.VISIBLE);
+                    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                    FirebaseUser currentUser = mAuth.getCurrentUser();
+
+                    if (currentUser != null) {
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                        DocumentReference userDocRef = db.collection("users").document(currentUser.getUid());
+                        userDocRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                if (documentSnapshot.exists()) {
+                                    List<String> currentSongs = (List<String>) documentSnapshot.get("userSongs");
+                                    if (currentSongs == null) {
+                                        currentSongs = new ArrayList<>();
+                                    }
+                                    currentSongs.remove(objectPosition);
+                                    Map<String, Object> updates = new HashMap<>();
+                                    updates.put("userSongs", currentSongs);
+                                    userDocRef.update(updates)
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    if (toast != null)
+                                                        toast.cancel();
+                                                    Log.d(TAG, "ObjectID removed from Firestore songs array successfully!");
+                                                    toast = Toast.makeText(requireContext(), "Removed song from user's list", Toast.LENGTH_SHORT);
+                                                    toast.show();
+                                                    loadingAnimation.setVisibility(View.GONE);
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    if (toast != null)
+                                                        toast.cancel();
+                                                    Log.e(TAG, "Error updating document", e);
+                                                    toast = Toast.makeText(requireContext(), "Error while removing song", Toast.LENGTH_SHORT);
+                                                    toast.show();
+                                                    loadingAnimation.setVisibility(View.GONE);
+                                                }
+                                            });
+                                } else {
+                                    if (toast != null)
+                                        toast.cancel();
+                                    Log.d(TAG, "Document does not exist");
+                                    toast = Toast.makeText(requireContext(), "Firestore db error", Toast.LENGTH_SHORT);
+                                    toast.show();
+                                    loadingAnimation.setVisibility(View.GONE);
+                                }
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                if (toast != null)
+                                    toast.cancel();
+                                Log.e(TAG, "Error fetching document", e);
+                                toast = Toast.makeText(requireContext(), "Error fetching user's list", Toast.LENGTH_SHORT);
+                                toast.show();
+                                loadingAnimation.setVisibility(View.GONE);
+                            }
+                        });
+                    } else {
+                        if (toast != null)
+                            toast.cancel();
+                        toast = Toast.makeText(requireContext(), "User not logged in", Toast.LENGTH_SHORT);
+                        toast.show();
+                        loadingAnimation.setVisibility(View.GONE);
+                    }
+                } else {
+                    if (toast != null)
+                        toast.cancel();
+                    toast = Toast.makeText(requireContext(), "Song id null", Toast.LENGTH_SHORT);
+                    toast.show();
+                    loadingAnimation.setVisibility(View.GONE);
+                }
+            }
+        });
+
         return view;
     }
 
@@ -476,6 +559,7 @@ public class searchFragment extends Fragment {
                     artistList.setVisibility(View.VISIBLE);
                     albumList.setVisibility(View.VISIBLE);
                     detAdd.setVisibility(View.VISIBLE);
+                    detDel.setVisibility(View.VISIBLE);
                 } else if (objectDetails.getString("type").equals("artist")) {
                     if (objectDetails.has("fanCount")) {
                         tmpString = objectDetails.getString("fanCount");
@@ -490,6 +574,7 @@ public class searchFragment extends Fragment {
                     albumList.setVisibility(View.VISIBLE);
                     artistSuggest.setVisibility(View.VISIBLE);
                     detAdd.setVisibility(View.GONE);
+                    detDel.setVisibility(View.GONE);
                 } else if (objectDetails.getString("type").equals("album")) {
                     if (objectDetails.has("description")) {
                         tmpString2 = objectDetails.getString("description");
@@ -503,6 +588,7 @@ public class searchFragment extends Fragment {
                     songList.setVisibility(View.VISIBLE);
                     artistList.setVisibility(View.VISIBLE);
                     detAdd.setVisibility(View.GONE);
+                    detDel.setVisibility(View.GONE);
                 } else if (objectDetails.getString("type").equals("playlist")) {
                     if (objectDetails.has("description"))
                         detInfo.setText(objectDetails.getString("description"));
@@ -510,6 +596,7 @@ public class searchFragment extends Fragment {
                         detInfo.setText("null");
                     songList.setVisibility(View.VISIBLE);
                     detAdd.setVisibility(View.GONE);
+                    detDel.setVisibility(View.GONE);
                 }
                 if (objectDetails.has("name"))
                     detName.setText(objectDetails.getString("name"));

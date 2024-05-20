@@ -3,6 +3,7 @@ package com.example.music8027;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -62,15 +63,13 @@ public class SignUpActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent i = new Intent(SignUpActivity.this, LoginActivity.class);
                 startActivity(i);
-                overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                toggleGroup.setVisibility(View.GONE);
-                loadingAnimation.setVisibility(View.VISIBLE);
                 sendVerificationEmail();
             }
         });
@@ -83,8 +82,63 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void sendVerificationEmail() {
+        String name = editTextName.getText().toString().trim();
         String email = editTextEmail.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
+        String passwordConf = editTextConfirmPassword.getText().toString().trim();
+
+        if (toast != null)
+            toast.cancel();
+
+        if (TextUtils.isEmpty(name)) {
+            toast = Toast.makeText(SignUpActivity.this, "Name cannot be empty",
+                    Toast.LENGTH_SHORT);
+            toast.show();
+            editTextName.setError("Name is required");
+            editTextName.requestFocus();
+            return;
+        }
+
+        if (TextUtils.isEmpty(email)) {
+            toast = Toast.makeText(SignUpActivity.this, "Email cannot be empty",
+                    Toast.LENGTH_SHORT);
+            toast.show();
+            editTextEmail.setError("Email is required");
+            editTextEmail.requestFocus();
+            return;
+        }
+
+        if (TextUtils.isEmpty(password)) {
+            toast = Toast.makeText(SignUpActivity.this, "Password cannot be empty",
+                    Toast.LENGTH_SHORT);
+            editTextPassword.setError("Password is required");
+            editTextPassword.requestFocus();
+            toast.show();
+            return;
+        }
+
+        if (TextUtils.isEmpty(passwordConf)) {
+            toast = Toast.makeText(SignUpActivity.this, "Password cannot be empty",
+                    Toast.LENGTH_SHORT);
+            editTextConfirmPassword.setError("Password is required");
+            editTextConfirmPassword.requestFocus();
+            toast.show();
+            return;
+        }
+
+        if (!password.equals(passwordConf)) {
+            toast = Toast.makeText(SignUpActivity.this, "Password dont match",
+                    Toast.LENGTH_SHORT);
+            editTextPassword.setError("Passwords dont match");
+            editTextConfirmPassword.setError("Passwords dont match");
+            editTextPassword.requestFocus();
+            editTextConfirmPassword.requestFocus();
+            toast.show();
+            return;
+        }
+
+        toggleGroup.setVisibility(View.GONE);
+        loadingAnimation.setVisibility(View.VISIBLE);
 
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -179,9 +233,31 @@ public class SignUpActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        Intent i = new Intent(SignUpActivity.this, LoginActivity.class);
-        startActivity(i);
-        finish();
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null && !user.isEmailVerified()) {
+            user.delete()
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                toggleGroup.setVisibility(View.VISIBLE);
+                                loadingAnimation.setVisibility(View.GONE);
+                                if (toast != null)
+                                    toast.cancel();
+                                Log.d(TAG, "User deleted");
+                                toast = Toast.makeText(SignUpActivity.this, "Sign up canceled", Toast.LENGTH_SHORT);
+                                toast.show();
+                            } else {
+                                if (toast != null)
+                                    toast.cancel();
+                                Log.w(TAG, "Error deleting user", task.getException());
+                                toast = Toast.makeText(SignUpActivity.this, "Clean up error", Toast.LENGTH_SHORT);
+                                toast.show();
+                            }
+                        }
+                    });
+        } else {
+            super.onBackPressed();
+        }
     }
 }

@@ -179,7 +179,7 @@
                     android:id="@+id/detailsClose"
                     android:layout_width="40sp"
                     android:layout_height="40sp"
-                    android:layout_marginTop="45sp"
+                    android:layout_marginTop="15sp"
                     android:background="@color/glass"
                     app:icon="@drawable/cancel_24px"
                     app:iconGravity="textStart"
@@ -204,6 +204,21 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/imgCard"
                     app:layout_constraintTop_toBottomOf="@+id/detailsClose" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/detailsDel"
+                    android:layout_width="40sp"
+                    android:layout_height="40sp"
+                    android:layout_marginTop="25sp"
+                    android:background="@color/glass"
+                    app:icon="@drawable/delete_24px"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="40sp"
+                    app:iconTint="@color/glass_red"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/imgCard"
+                    app:layout_constraintTop_toBottomOf="@+id/detailsAdd" />
 
                 <TextView
                     android:id="@+id/detailsName"
