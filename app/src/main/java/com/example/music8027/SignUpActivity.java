@@ -1,5 +1,6 @@
 package com.example.music8027;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,13 +10,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.fragment.app.Fragment;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -24,8 +21,10 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,12 +37,11 @@ public class SignUpActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private LottieAnimationView loadingAnimation;
     private MaterialButtonToggleGroup toggleGroup;
-    private  Toast toast = null;
+    private Toast toast = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_sign_up);
 
         mAuth = FirebaseAuth.getInstance();
@@ -72,12 +70,6 @@ public class SignUpActivity extends AppCompatActivity {
             public void onClick(View v) {
                 sendVerificationEmail();
             }
-        });
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
         });
     }
 
@@ -170,10 +162,17 @@ public class SignUpActivity extends AppCompatActivity {
                         } else {
                             if (toast != null)
                                 toast.cancel();
-                            toast = Toast.makeText(SignUpActivity.this, "Failed to create account. Please try again", Toast.LENGTH_SHORT);
-                            toast.show();
-                            toggleGroup.setVisibility(View.VISIBLE);
-                            loadingAnimation.setVisibility(View.GONE);
+                            // Handle different authentication errors
+                            Exception exception = task.getException();
+                            if (exception instanceof FirebaseAuthUserCollisionException) {
+                                // ReCAPTCHA verification required
+                                showReCAPTCHAPrompt();
+                            } else {
+                                toast = Toast.makeText(SignUpActivity.this, "Failed to create account. Please try again", Toast.LENGTH_SHORT);
+                                toast.show();
+                                toggleGroup.setVisibility(View.VISIBLE);
+                                loadingAnimation.setVisibility(View.GONE);
+                            }
                         }
                     }
                 });
@@ -195,6 +194,26 @@ public class SignUpActivity extends AppCompatActivity {
                 }
             }
         }, 2000);
+    }
+
+    private void showReCAPTCHAPrompt() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Verification Required");
+        builder.setMessage("Please complete the reCAPTCHA verification to continue.");
+        builder.setPositiveButton("Verify", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Initiate reCAPTCHA verification
+                sendVerificationEmail();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Handle cancellation, if necessary
+            }
+        });
+        builder.show();
     }
 
     public void addUserToFirestore(String name, String email) {
