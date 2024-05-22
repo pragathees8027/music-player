@@ -136,84 +136,25 @@ public class SignUpActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
+                        addUserToFirestore(name, email);
                         if (task.isSuccessful()) {
-                            mAuth.getCurrentUser().sendEmailVerification()
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> verificationTask) {
-                                            if (verificationTask.isSuccessful()) {
-                                                if (toast != null)
-                                                    toast.cancel();
-                                                toast = Toast.makeText(SignUpActivity.this, "Verification email sent", Toast.LENGTH_SHORT);
-                                                toast.show();
-                                                toggleGroup.setVisibility(View.GONE);
-                                                loadingAnimation.setVisibility(View.VISIBLE);
-                                                checkEmailVerificationStatus();
-                                            } else {
-                                                if (toast != null)
-                                                    toast.cancel();
-                                                toast = Toast.makeText(SignUpActivity.this, "Failed to send verification email", Toast.LENGTH_SHORT);
-                                                toast.show();
-                                                toggleGroup.setVisibility(View.VISIBLE);
-                                                loadingAnimation.setVisibility(View.GONE);
-                                            }
-                                        }
-                                    });
+                            if (toast != null)
+                                toast.cancel();
+                            toast = Toast.makeText(SignUpActivity.this, "Sign Up successful", Toast.LENGTH_SHORT);
+                            toast.show();
+                            toggleGroup.setVisibility(View.VISIBLE);
+                            loadingAnimation.setVisibility(View.GONE);
                         } else {
                             if (toast != null)
                                 toast.cancel();
-                            // Handle different authentication errors
-                            Exception exception = task.getException();
-                            if (exception instanceof FirebaseAuthUserCollisionException) {
-                                // ReCAPTCHA verification required
-                                showReCAPTCHAPrompt();
-                            } else {
+
                                 toast = Toast.makeText(SignUpActivity.this, "Failed to create account. Please try again", Toast.LENGTH_SHORT);
                                 toast.show();
                                 toggleGroup.setVisibility(View.VISIBLE);
                                 loadingAnimation.setVisibility(View.GONE);
-                            }
                         }
                     }
                 });
-    }
-
-    private void checkEmailVerificationStatus() {
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                FirebaseUser user = mAuth.getCurrentUser();
-                if (user != null) {
-                    user.reload();
-                    if (user.isEmailVerified()) {
-                        addUserToFirestore(editTextName.getText().toString().trim(), editTextEmail.getText().toString().trim());
-                    } else {
-                        checkEmailVerificationStatus();
-                    }
-                }
-            }
-        }, 2000);
-    }
-
-    private void showReCAPTCHAPrompt() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Verification Required");
-        builder.setMessage("Please complete the reCAPTCHA verification to continue.");
-        builder.setPositiveButton("Verify", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // Initiate reCAPTCHA verification
-                sendVerificationEmail();
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // Handle cancellation, if necessary
-            }
-        });
-        builder.show();
     }
 
     public void addUserToFirestore(String name, String email) {
