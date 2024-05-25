@@ -25,6 +25,7 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -190,21 +191,33 @@ public class SignUpActivity extends AppCompatActivity {
                     }
                 });
 
+        Map<String, Object> userSongs = new HashMap<>();
+        userSongs.put("songs", new ArrayList<String>() { });
+
         db.collection("userSongs")
                 .document(mAuth.getCurrentUser().getUid())
-                .set(user);
+                .set(userSongs);
+
+        Map<String, Object> userAlbums = new HashMap<>();
+        userAlbums.put("albums", new ArrayList<String>() { });
 
         db.collection("userAlbums")
                 .document(mAuth.getCurrentUser().getUid())
-                .set(user);
+                .set(userAlbums);
+
+        Map<String, Object> userArtists = new HashMap<>();
+        userArtists.put("artists", new ArrayList<String>() { });
 
         db.collection("userArtists")
                 .document(mAuth.getCurrentUser().getUid())
-                .set(user);
+                .set(userArtists);
+
+        Map<String, Object> userPlaylists = new HashMap<>();
+        userPlaylists.put("playlists", new ArrayList<String>() { });
 
         db.collection("userPlaylists")
                 .document(mAuth.getCurrentUser().getUid())
-                .set(user);
+                .set(userPlaylists);
     }
 
     @Override
