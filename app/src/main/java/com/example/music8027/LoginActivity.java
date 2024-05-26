@@ -1,19 +1,16 @@
 package com.example.music8027;
 
-import android.annotation.SuppressLint;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -23,14 +20,7 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.mailersend.sdk.emails.*;
-import com.mailersend.sdk.MailerSend;
-import com.mailersend.sdk.MailerSendResponse;
-import com.mailersend.sdk.exceptions.MailerSendException;
 import org.apache.commons.lang3.RandomStringUtils;
-
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -44,11 +34,13 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private TextView forgotPassword;
     private EditText email, password;
+    private ImageView icon;
     private LottieAnimationView loadingAnimation;
     private Toast toast = null;
     private static final String TAG = "LoginActivity";
     private String otpString = null;
     private String userPass = null;
+    private boolean login = false;
     @Override
     public void onStart() {
         dataManager = DataManager.getInstance(LoginActivity.this);
@@ -82,6 +74,7 @@ public class LoginActivity extends AppCompatActivity {
 
         email = findViewById(R.id.email);
         password = findViewById(R.id.password);
+        icon = findViewById(R.id.passwordIcon);
         forgotPassword = findViewById(R.id.forgotPassword);
 
         forgotPassword.setOnClickListener(new View.OnClickListener() {
@@ -119,6 +112,35 @@ public class LoginActivity extends AppCompatActivity {
                 String emailString, passwordString;
                 emailString = email.getText().toString();
                 passwordString = password.getText().toString();
+
+                if (!login) {
+                    db.collection("users")
+                            .document(emailString)
+                            .get()
+                            .addOnSuccessListener(documentSnapshot -> {
+                                if (documentSnapshot.exists()) {
+                                    userPass = documentSnapshot.getString("password");
+                                    password.setVisibility(View.VISIBLE);
+                                    icon.setVisibility(View.VISIBLE);
+                                    loginButton.setText("Login");
+                                    login = true;
+                                } else {
+                                    if (toast != null)
+                                        toast.cancel();
+                                    Log.d(TAG, "Error fetching user data, No such document");
+                                    toast = Toast.makeText(LoginActivity.this, "User not found", Toast.LENGTH_SHORT);
+                                    toast.show();
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                if (toast != null)
+                                    toast.cancel();
+                                Log.e(TAG, "Error fetching user data: " + e.getMessage());
+                                toast = Toast.makeText(LoginActivity.this, "Error fetching user data", Toast.LENGTH_SHORT);
+                                toast.show();
+                            });
+                    return;
+                }
 
                 if (toast != null)
                     toast.cancel();
@@ -167,17 +189,20 @@ public class LoginActivity extends AppCompatActivity {
                             toast.show();
                         });
 
-                if (passwordString.equals(userPass)) {
-                    Intent i = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(i);
-                    finish();
-                } else {
+                if (!passwordString.equals(userPass)) {
                     if (toast != null)
                         toast.cancel();
                     Log.e(TAG, "Invalid credentials");
                     toast = Toast.makeText(LoginActivity.this, "Invalid credentials", Toast.LENGTH_SHORT);
                     toast.show();
                 }
+
+                if (passwordString.equals(userPass)) {
+                    Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(i);
+                    finish();
+                }
+
                 toggleGroup.setVisibility(View.VISIBLE);
                 forgotPassword.setVisibility(View.VISIBLE);
                 loadingAnimation.setVisibility(View.GONE);
