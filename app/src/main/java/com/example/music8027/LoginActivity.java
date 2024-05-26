@@ -275,6 +275,7 @@ public class LoginActivity extends AppCompatActivity {
             email.setFocusable(true);
             password.setVisibility(View.GONE);
             icon.setVisibility(View.GONE);
+            forgotPassword.setVisibility(View.GONE);
             login = false;
             return;
         }
