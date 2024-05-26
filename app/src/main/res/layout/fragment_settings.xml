@@ -56,15 +56,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/header" />
 
-    <EditText
+    <TextView
         android:id="@+id/email"
         android:layout_width="250sp"
         android:layout_height="60sp"
         android:layout_marginTop="8dp"
         android:layout_marginStart="30sp"
         android:hint="email"
+        android:textSize="18sp"
         android:singleLine="true"
-        android:padding="10sp"
+        android:paddingTop="18sp"
         android:textAlignment="center"
         android:textCursorDrawable="@null"
         app:layout_constraintEnd_toEndOf="parent"

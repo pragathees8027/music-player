@@ -51,6 +51,7 @@ public class songsFragment extends Fragment {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
     private GridLayoutManager gridLayoutManager;
+    private DataManager dataManager;
     private List<Object> viewItems = new ArrayList<>();
     private ArrayList<JSONObject> searchResult = new ArrayList<JSONObject>();
     private List<String> songsList;
@@ -69,6 +70,7 @@ public class songsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_songs, container, false);
+        dataManager = DataManager.getInstance(requireContext());
 
         mRecyclerView = view.findViewById(R.id.song_recycle_view);
         mRecyclerView.setHasFixedSize(true);
@@ -261,9 +263,9 @@ public class songsFragment extends Fragment {
                     FirebaseAuth mAuth = FirebaseAuth.getInstance();
                     FirebaseUser currentUser = mAuth.getCurrentUser();
 
-                    if (currentUser != null) {
+                    if (dataManager.getUserID() != null) {
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        DocumentReference userDocRef = db.collection(collection).document(currentUser.getUid());
+                        DocumentReference userDocRef = db.collection(collection).document(dataManager.getUserID());
                         String finalField = field;
                         userDocRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                             @Override
@@ -386,9 +388,9 @@ public class songsFragment extends Fragment {
                             break;
                     }
 
-                    if (currentUser != null) {
+                    if (dataManager.getUserID() != null) {
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        DocumentReference userDocRef = db.collection(collection).document(currentUser.getUid());
+                        DocumentReference userDocRef = db.collection(collection).document(dataManager.getUserID());
                         String finalField = field;
                         userDocRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                             @Override
@@ -483,12 +485,9 @@ public class songsFragment extends Fragment {
 
         @Override
         protected ArrayList<JSONObject> doInBackground(String... params) {
-            FirebaseAuth mAuth = FirebaseAuth.getInstance();
-            FirebaseUser currentUser = mAuth.getCurrentUser();
-
-            if (currentUser != null) {
+            if (dataManager.getUserID() != null) {
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
-                DocumentReference userDocRef = db.collection(params[0]).document(currentUser.getUid());
+                DocumentReference userDocRef = db.collection(params[0]).document(dataManager.getUserID());
                 userDocRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         try {

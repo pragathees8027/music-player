@@ -1,12 +1,16 @@
 package com.example.music8027;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -25,11 +29,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class settingsFragment extends Fragment {
-
     private static final String TAG = "SignUpActivity";
-    private EditText editTextName, editTextEmail, editTextPassword, editTextConfirmPassword;
-    private FirebaseAuth mAuth;
-    FirebaseUser currentUser;
+    private EditText editTextName, editTextPassword, editTextConfirmPassword;
+    private TextView editTextEmail;
+    private DataManager dataManager;
     private FirebaseFirestore db;
     private LottieAnimationView loadingAnimation;
     private Toast toast = null;
@@ -38,9 +41,8 @@ public class settingsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
-        mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-        currentUser = mAuth.getCurrentUser();
+        dataManager = DataManager.getInstance(requireContext());
 
         editTextName = view.findViewById(R.id.userName);
         editTextEmail = view.findViewById(R.id.email);
@@ -57,7 +59,7 @@ public class settingsFragment extends Fragment {
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FirebaseAuth.getInstance().signOut();
+                dataManager.setUserID(null);
                 Intent intent = new Intent(requireActivity(), LoginActivity.class);
                 startActivity(intent);
                 requireActivity().finish();
@@ -87,11 +89,11 @@ public class settingsFragment extends Fragment {
 
     private void updateUserDetails() {
         String name = editTextName.getText().toString().trim();
-        String email = editTextEmail.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
+        String email = editTextEmail.getText().toString();
         String confirmPassword = editTextConfirmPassword.getText().toString().trim();
 
-        if (name.isEmpty() || email.isEmpty()) {
+        if (name.isEmpty()) {
 
             if (toast != null)
                 toast.cancel();
@@ -100,59 +102,21 @@ public class settingsFragment extends Fragment {
             return;
         }
 
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            if (!password.isEmpty() && !password.equals(confirmPassword)) {
-                if (toast != null)
-                    toast.cancel();
-                toast = Toast.makeText(getActivity(), "Passwords do not match", Toast.LENGTH_SHORT);
-                toast.show();
-                return;
-            }
-
-            currentUser.updateEmail(email)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            if (!password.isEmpty()) {
-                                currentUser.updatePassword(password)
-                                        .addOnCompleteListener(passwordUpdateTask -> {
-                                            if (passwordUpdateTask.isSuccessful()) {
-                                                if (toast != null)
-                                                    toast.cancel();
-                                                toast = Toast.makeText(getActivity(), "Password updated successfully", Toast.LENGTH_SHORT);
-                                                toast.show();
-                                            } else {
-                                                if (toast != null)
-                                                    toast.cancel();
-                                                toast = Toast.makeText(getActivity(), "Failed to update password: " + passwordUpdateTask.getException().getMessage(), Toast.LENGTH_SHORT);
-                                                toast.show();
-                                            }
-                                        });
-                            }
-                            updateUserDocument(name, email);
-                        } else {
-                            if (toast != null)
-                                toast.cancel();
-                            toast = Toast.makeText(getActivity(), "Failed to update email: " + task.getException().getMessage(), Toast.LENGTH_SHORT);
-                            toast.show();
-                        }
-                    });
-        } else {
+        if (!confirmPassword.equals(password)) {
             if (toast != null)
                 toast.cancel();
-            toast = Toast.makeText(getActivity(), "No user logged in", Toast.LENGTH_SHORT);
+            toast = Toast.makeText(getActivity(), "Passwords don't match", Toast.LENGTH_SHORT);
             toast.show();
+            return;
         }
-    }
 
-
-    private void updateUserDocument(String name, String email) {
         Map<String, Object> user = new HashMap<>();
-        user.put("name", name);
+        user.put("password", password);
         user.put("email", email);
+        user.put("name", name);
 
         db.collection("users")
-                .document(mAuth.getCurrentUser().getUid())
+                .document(email)
                 .update(user)
                 .addOnSuccessListener(aVoid -> {
                     if (toast != null)
@@ -171,9 +135,9 @@ public class settingsFragment extends Fragment {
 
 
     private void fetchUserData() {
-        if (currentUser != null) {
+        if (dataManager.getUserID() != null) {
             db.collection("users")
-                    .document(currentUser.getUid())
+                    .document(dataManager.getUserID())
                     .get()
                     .addOnSuccessListener(documentSnapshot -> {
                         if (documentSnapshot.exists()) {

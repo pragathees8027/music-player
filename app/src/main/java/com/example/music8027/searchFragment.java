@@ -58,6 +58,7 @@ public class searchFragment extends Fragment {
     private String songName = null;
     private String searchSpecifier = "";
     private String objectID = "";
+    private DataManager dataManager;
     private LottieAnimationView loadingAnimation, noResult;
     private MaterialCardView detCard;
     private MaterialButton search, topBtn, songBtn, albumBtn, artistBtn, playlistBtn, detAdd, detDel, detClose, songList, songSuggest, albumList, artistList, artistSuggest;
@@ -71,6 +72,7 @@ public class searchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
+        dataManager = DataManager.getInstance(requireContext());
 
         mRecyclerView = view.findViewById(R.id.song_recycle_view);
         mRecyclerView.setHasFixedSize(true);
@@ -288,9 +290,9 @@ public class searchFragment extends Fragment {
                     FirebaseAuth mAuth = FirebaseAuth.getInstance();
                     FirebaseUser currentUser = mAuth.getCurrentUser();
 
-                    if (currentUser != null) {
+                    if (dataManager.getUserID() != null) {
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        DocumentReference userDocRef = db.collection(collection).document(currentUser.getUid());
+                        DocumentReference userDocRef = db.collection(collection).document(dataManager.getUserID());
                         String finalField = field;
                         userDocRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                             @Override
@@ -413,9 +415,9 @@ public class searchFragment extends Fragment {
                             break;
                     }
 
-                    if (currentUser != null) {
+                    if (dataManager.getUserID() != null) {
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        DocumentReference userDocRef = db.collection(collection).document(currentUser.getUid());
+                        DocumentReference userDocRef = db.collection(collection).document(dataManager.getUserID());
                         String finalField = field;
                         userDocRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                             @Override

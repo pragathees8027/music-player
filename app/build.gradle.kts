@@ -60,5 +60,10 @@ dependencies {
     implementation("commons-io:commons-io:2.4")
     implementation("androidx.appcompat:appcompat:1.3.0")
     implementation("com.squareup.picasso:picasso:2.71828")
+    implementation ("com.mailersend:java-sdk:1.0.0")
+    implementation ("org.apache.commons:commons-lang3:3.12.0")
+    implementation ("com.sun.mail:android-mail:1.6.5")
+    implementation ("com.sun.mail:android-activation:1.6.5")
+    implementation ("com.squareup.okhttp3:okhttp:4.9.1")
 }
 
