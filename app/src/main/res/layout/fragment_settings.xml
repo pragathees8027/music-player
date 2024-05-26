@@ -173,6 +173,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/loginToggleGroup" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/deleteAccountButton"
+        android:layout_width="180sp"
+        android:layout_height="60sp"
+        android:backgroundTint="@color/glass_red"
+        android:text="Account"
+        android:textColor="@color/black"
+        android:textSize="15sp"
+        app:icon="@drawable/delete_24px"
+        app:iconTint="@color/white"
+        android:layout_marginTop="10sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/calculatorButton" />
+
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/login_animation"
         android:layout_width="80sp"

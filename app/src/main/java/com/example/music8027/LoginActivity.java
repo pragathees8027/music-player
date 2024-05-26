@@ -86,10 +86,7 @@ public class LoginActivity extends AppCompatActivity {
                     loadingAnimation.setVisibility(View.GONE);
                     forgotPassword.setVisibility(View.VISIBLE);
                     toggleGroup.setVisibility(View.VISIBLE);
-                    if (toast != null)
-                        toast.cancel();
-                    toast = Toast.makeText(LoginActivity.this, "Enter your email to reset password", Toast.LENGTH_SHORT);
-                    toast.show();
+                    email.setError("Required");
                     return;
                 }
 
@@ -113,6 +110,15 @@ public class LoginActivity extends AppCompatActivity {
                 emailString = email.getText().toString();
                 passwordString = password.getText().toString();
 
+                if (TextUtils.isEmpty(emailString)) {
+                    email.setError("Email is required");
+                    email.requestFocus();
+                    return;
+                }
+
+                if (toast != null)
+                    toast.cancel();
+
                 if (!login) {
                     db.collection("users")
                             .document(emailString)
@@ -122,6 +128,7 @@ public class LoginActivity extends AppCompatActivity {
                                     userPass = documentSnapshot.getString("password");
                                     password.setVisibility(View.VISIBLE);
                                     icon.setVisibility(View.VISIBLE);
+                                    email.setFocusable(false);
                                     loginButton.setText("Login");
                                     login = true;
                                 } else {
@@ -139,18 +146,6 @@ public class LoginActivity extends AppCompatActivity {
                                 toast = Toast.makeText(LoginActivity.this, "Error fetching user data", Toast.LENGTH_SHORT);
                                 toast.show();
                             });
-                    return;
-                }
-
-                if (toast != null)
-                    toast.cancel();
-
-                if (TextUtils.isEmpty(emailString)) {
-                    toast = Toast.makeText(LoginActivity.this, "Email cannot be empty",
-                            Toast.LENGTH_SHORT);
-                    toast.show();
-                    email.setError("Email is required");
-                    email.requestFocus();
                     return;
                 }
 
@@ -272,6 +267,17 @@ public class LoginActivity extends AppCompatActivity {
             return activeNetworkInfo != null && activeNetworkInfo.isConnected();
         }
         return false;
+    }
+
+    public void onBackPressed() {
+        if (login){
+            email.setFocusable(true);
+            password.setVisibility(View.GONE);
+            icon.setVisibility(View.GONE);
+            login = false;
+            return;
+        }
+        super.onBackPressed();
     }
 
     protected void onDestroy(){

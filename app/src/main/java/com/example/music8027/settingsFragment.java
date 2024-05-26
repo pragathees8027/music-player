@@ -23,8 +23,10 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,6 +38,7 @@ public class settingsFragment extends Fragment {
     private FirebaseFirestore db;
     private LottieAnimationView loadingAnimation;
     private Toast toast = null;
+    private String userPass = null;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -53,6 +56,7 @@ public class settingsFragment extends Fragment {
         MaterialButton updateButton = view.findViewById(R.id.updateButton);
         MaterialButton logoutButton = view.findViewById(R.id.logoutButton);
         MaterialButton calcButton = view.findViewById(R.id.calculatorButton);
+        MaterialButton delete = view.findViewById(R.id.deleteAccountButton);
         loadingAnimation = view.findViewById(R.id.login_animation);
 
         fetchUserData();
@@ -84,6 +88,30 @@ public class settingsFragment extends Fragment {
             }
         });
 
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String password = editTextPassword.getText().toString().trim();
+                String confirmPassword = editTextConfirmPassword.getText().toString().trim();
+
+                if (!confirmPassword.equals(userPass) && !password.equals(userPass)) {
+                    editTextPassword.setError("Wrong password");
+                    editTextConfirmPassword.setError("Wrong password");
+                    return;
+                }
+
+                toggleGroup.setVisibility(View.GONE);
+                loadingAnimation.setVisibility(View.VISIBLE);
+                deleteUserData();
+                toggleGroup.setVisibility(View.VISIBLE);
+                loadingAnimation.setVisibility(View.GONE);
+                dataManager.setUserID(null);
+                Intent intent = new Intent(requireActivity(), LoginActivity.class);
+                startActivity(intent);
+                requireActivity().finish();
+            }
+        });
+
         return view;
     }
 
@@ -97,16 +125,14 @@ public class settingsFragment extends Fragment {
 
             if (toast != null)
                 toast.cancel();
-            toast = Toast.makeText(getActivity(), "Name and Email are required fields", Toast.LENGTH_SHORT);
-            toast.show();
+            editTextName.setError("Required");
             return;
         }
 
         if (!confirmPassword.equals(password)) {
             if (toast != null)
                 toast.cancel();
-            toast = Toast.makeText(getActivity(), "Passwords don't match", Toast.LENGTH_SHORT);
-            toast.show();
+            editTextConfirmPassword.setError("Password doesn't match");
             return;
         }
 
@@ -133,6 +159,28 @@ public class settingsFragment extends Fragment {
                 });
     }
 
+    private void deleteUserData() {
+        ArrayList<DocumentReference> userData = new ArrayList<DocumentReference>();
+        userData.add(db.collection("users").document(dataManager.getUserID()));
+        userData.add(db.collection("userSongs").document(dataManager.getUserID()));
+        userData.add(db.collection("userAlbums").document(dataManager.getUserID()));
+        userData.add(db.collection("userArtists").document(dataManager.getUserID()));
+        userData.add(db.collection("userPlaylists").document(dataManager.getUserID()));
+
+        for (DocumentReference docRef : userData) {
+            try {
+                docRef.delete();
+                Log.d(TAG, "Document deleted successfully: " + docRef.getId());
+            } catch (Exception e) {
+                Log.d(TAG, "Error deleting document: " + docRef.getId());
+            }
+        }
+
+        if (toast != null)
+            toast.cancel();
+        toast = Toast.makeText(getActivity(), "Deleted user account", Toast.LENGTH_SHORT);
+        toast.show();
+    }
 
     private void fetchUserData() {
         if (dataManager.getUserID() != null) {
@@ -143,6 +191,7 @@ public class settingsFragment extends Fragment {
                         if (documentSnapshot.exists()) {
                             String name = documentSnapshot.getString("name");
                             String email = documentSnapshot.getString("email");
+                            userPass = documentSnapshot.getString("password");
                             editTextName.setText(name);
                             editTextEmail.setText(email);
                             if (toast != null)
