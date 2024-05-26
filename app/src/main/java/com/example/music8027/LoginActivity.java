@@ -128,6 +128,7 @@ public class LoginActivity extends AppCompatActivity {
                                     userPass = documentSnapshot.getString("password");
                                     password.setVisibility(View.VISIBLE);
                                     icon.setVisibility(View.VISIBLE);
+                                    forgotPassword.setVisibility(View.VISIBLE);
                                     email.setFocusable(false);
                                     loginButton.setText("Login");
                                     login = true;

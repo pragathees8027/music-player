@@ -137,7 +137,10 @@ public class settingsFragment extends Fragment {
         }
 
         Map<String, Object> user = new HashMap<>();
-        user.put("password", password);
+        if (password.isEmpty())
+            user.put("password", userPass);
+        else
+            user.put("password", password);
         user.put("email", email);
         user.put("name", name);
 
