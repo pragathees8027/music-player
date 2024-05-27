@@ -216,7 +216,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void sendVerificationEmail(String emailString) {
         String subject = "Password Reset";
-        String msg = "Your password has been reset.\nUse the below password to login and change your password in profile\nPassword: ";
+        String msg = "\n\nYour password has been reset.\nUse the below password to login and change your password in profile.\n\nPassword: ";
         otpString = RandomStringUtils.random(8, true, true);
         updateUserPassword(otpString, emailString);
         SendEmailTask sendEmailTask = new SendEmailTask(emailString, emailString, subject, otpString, msg, 8);

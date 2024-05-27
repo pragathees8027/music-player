@@ -80,33 +80,28 @@ public class SignUpActivity extends AppCompatActivity {
                 String name = editTextName.getText().toString().trim();
                 String email = editTextEmail.getText().toString().trim();
                 String password = editTextPassword.getText().toString().trim();
-                if (toast != null)
-                    toast.cancel();
 
                 if (TextUtils.isEmpty(name)) {
-                    toast = Toast.makeText(SignUpActivity.this, "Name cannot be empty",
-                            Toast.LENGTH_SHORT);
-                    toast.show();
                     editTextName.setError("Name is required");
                     editTextName.requestFocus();
                     return;
                 }
 
                 if (TextUtils.isEmpty(email)) {
-                    toast = Toast.makeText(SignUpActivity.this, "Email cannot be empty",
-                            Toast.LENGTH_SHORT);
-                    toast.show();
                     editTextEmail.setError("Email is required");
                     editTextEmail.requestFocus();
                     return;
                 }
 
                 if (TextUtils.isEmpty(password)) {
-                    toast = Toast.makeText(SignUpActivity.this, "Password cannot be empty",
-                            Toast.LENGTH_SHORT);
                     editTextPassword.setError("Password is required");
                     editTextPassword.requestFocus();
-                    toast.show();
+                    return;
+                }
+
+                if (TextUtils.isEmpty(editTextotp.getText().toString())) {
+                    editTextotp.setError("OTP is required");
+                    editTextotp.requestFocus();
                     return;
                 }
 
@@ -177,7 +172,7 @@ public class SignUpActivity extends AppCompatActivity {
         }
 
         String subject = "Email Verification";
-        String msg = "OTP: ";
+        String msg = "\n\nEnter this OTP to sign up.\n\nOTP: ";
         otpString = RandomStringUtils.random(5, true, true);
 
         SendEmailTask sendEmailTask = new SendEmailTask(name, email, subject, otpString, msg, 5);

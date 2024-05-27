@@ -135,15 +135,29 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/password" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/otpButton"
+        android:layout_width="150sp"
+        android:layout_height="60sp"
+        android:layout_marginTop="15sp"
+        android:backgroundTint="@color/glass_teal"
+        android:text="Get OTP"
+        app:icon="@drawable/otp_icon"
+        app:iconTint="@color/glass_red"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/confirmPassword" />
+
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/loginToggleGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30sp"
+        android:layout_marginTop="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:visibility="visible"
-        app:layout_constraintTop_toBottomOf="@+id/confirmPassword">
+        app:layout_constraintTop_toBottomOf="@+id/otpButton">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/signUpButton"
@@ -153,15 +167,6 @@
             android:text="Sing Up"
             app:icon="@drawable/add_circle_24px"
             app:iconTint="@color/glass_red"
-            android:textColor="@color/black"
-            android:textSize="15sp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/otpButton"
-            android:layout_width="80sp"
-            android:layout_height="60sp"
-            android:backgroundTint="@color/glass_teal"
-            android:text="OTP"
             android:textColor="@color/black"
             android:textSize="15sp" />
 

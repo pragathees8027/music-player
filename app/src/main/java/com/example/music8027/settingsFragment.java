@@ -94,9 +94,11 @@ public class settingsFragment extends Fragment {
                 String password = editTextPassword.getText().toString().trim();
                 String confirmPassword = editTextConfirmPassword.getText().toString().trim();
 
-                if (!confirmPassword.equals(userPass) && !password.equals(userPass)) {
+                if (!confirmPassword.equals(userPass) || !password.equals(userPass)) {
                     editTextPassword.setError("Wrong password");
                     editTextConfirmPassword.setError("Wrong password");
+                    editTextPassword.requestFocus();
+                    editTextConfirmPassword.requestFocus();
                     return;
                 }
 
@@ -126,6 +128,7 @@ public class settingsFragment extends Fragment {
             if (toast != null)
                 toast.cancel();
             editTextName.setError("Required");
+            editTextName.requestFocus();
             return;
         }
 
@@ -133,6 +136,7 @@ public class settingsFragment extends Fragment {
             if (toast != null)
                 toast.cancel();
             editTextConfirmPassword.setError("Password doesn't match");
+            editTextConfirmPassword.requestFocus();
             return;
         }
 
