@@ -38,7 +38,7 @@ public class SignUpActivity extends AppCompatActivity {
     private Toast toast = null;
     private DataManager dataManager;
     private  String otpString = null;
-    private  boolean oldUser = false;
+    private  boolean oldUser = false, conflict = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,20 +99,39 @@ public class SignUpActivity extends AppCompatActivity {
                     return;
                 }
 
-                /*if (TextUtils.isEmpty(editTextotp.getText().toString())) {
-                    editTextotp.setError("OTP is required");
-                    editTextotp.requestFocus();
+                if (!conflict) {
+                    db.collection("users")
+                            .document(email)
+                            .get()
+                            .addOnSuccessListener(documentSnapshot -> {
+                                if (documentSnapshot.exists()) {
+                                    conflict = false;
+                                    if (toast != null)
+                                        toast.cancel();
+                                    Log.e(TAG, "User already exists");
+                                    toast = Toast.makeText(SignUpActivity.this, "User already exists", Toast.LENGTH_SHORT);
+                                    toast.show();
+                                } else {
+                                    conflict= true;
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                if (toast != null)
+                                    toast.cancel();
+                                Log.e(TAG, "Error fetching user data: " + e.getMessage());
+                                toast = Toast.makeText(SignUpActivity.this, "Error fetching user data", Toast.LENGTH_SHORT);
+                                toast.show();
+                            });
                     return;
-                }*/
+                }
 
-                /*if (editTextotp.getText().toString().equals(otpString)) {
+                if (!conflict) {
+                    conflict = false;
+                } else {
                     addUserToFirestore();
                     dataManager.setUserID(email);
-                }*/
-
-                addUserToFirestore();
-                dataManager.setUserID(email);
-                Log.w(TAG, dataManager.getUserID());
+                    Log.w(TAG, dataManager.getUserID());
+                }
                 /*Log.w(TAG, otpString);*/
             }
         });
