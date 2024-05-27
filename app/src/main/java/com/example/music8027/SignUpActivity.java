@@ -99,17 +99,21 @@ public class SignUpActivity extends AppCompatActivity {
                     return;
                 }
 
-                if (TextUtils.isEmpty(editTextotp.getText().toString())) {
+                /*if (TextUtils.isEmpty(editTextotp.getText().toString())) {
                     editTextotp.setError("OTP is required");
                     editTextotp.requestFocus();
                     return;
-                }
+                }*/
 
-                if (editTextotp.getText().toString().equals(otpString)) {
+                /*if (editTextotp.getText().toString().equals(otpString)) {
                     addUserToFirestore();
                     dataManager.setUserID(email);
-                }
-                Log.w(TAG, otpString);
+                }*/
+
+                addUserToFirestore();
+                dataManager.setUserID(email);
+                Log.w(TAG, dataManager.getUserID());
+                /*Log.w(TAG, otpString);*/
             }
         });
     }
