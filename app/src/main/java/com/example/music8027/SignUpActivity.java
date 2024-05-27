@@ -99,7 +99,6 @@ public class SignUpActivity extends AppCompatActivity {
                     return;
                 }
 
-                if (!conflict) {
                     db.collection("users")
                             .document(email)
                             .get()
@@ -112,6 +111,9 @@ public class SignUpActivity extends AppCompatActivity {
                                     toast = Toast.makeText(SignUpActivity.this, "User already exists", Toast.LENGTH_SHORT);
                                     toast.show();
                                 } else {
+                                    addUserToFirestore();
+                                    dataManager.setUserID(email);
+                                    Log.w(TAG, dataManager.getUserID());
                                     conflict= true;
                                 }
                             })
@@ -122,16 +124,6 @@ public class SignUpActivity extends AppCompatActivity {
                                 toast = Toast.makeText(SignUpActivity.this, "Error fetching user data", Toast.LENGTH_SHORT);
                                 toast.show();
                             });
-                    return;
-                }
-
-                if (!conflict) {
-                    conflict = false;
-                } else {
-                    addUserToFirestore();
-                    dataManager.setUserID(email);
-                    Log.w(TAG, dataManager.getUserID());
-                }
                 /*Log.w(TAG, otpString);*/
             }
         });
