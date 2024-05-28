@@ -164,6 +164,7 @@
         android:layout_height="60sp"
         android:backgroundTint="@color/glass_teal"
         android:text="Calculator"
+        android:visibility="gone"
         android:textColor="@color/black"
         android:textSize="15sp"
         app:icon="@drawable/function_24px"
