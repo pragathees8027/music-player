@@ -15,12 +15,18 @@ import androidx.fragment.app.Fragment;
 
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,7 +56,7 @@ public class settingsFragment extends Fragment {
         MaterialButtonToggleGroup toggleGroup = view.findViewById(R.id.loginToggleGroup);
         MaterialButton updateButton = view.findViewById(R.id.updateButton);
         MaterialButton logoutButton = view.findViewById(R.id.logoutButton);
-        MaterialButton calcButton = view.findViewById(R.id.calculatorButton);
+        MaterialButton delAccButton = view.findViewById(R.id.deleteAccountButton);
         loadingAnimation = view.findViewById(R.id.login_animation);
 
         fetchUserData();
@@ -64,10 +70,80 @@ public class settingsFragment extends Fragment {
             }
         });
 
-        calcButton.setOnClickListener(new View.OnClickListener() {
+        delAccButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity)getActivity()).replaceFragment(new calcFragment());
+                String delUid = currentUser.getUid();
+                String email = editTextEmail.getText().toString().trim();
+                String password = editTextPassword.getText().toString().trim();
+                String confirmPassword = editTextConfirmPassword.getText().toString().trim();
+
+                if (password.isEmpty()) {
+                    editTextPassword.setError("Required");
+                    editTextPassword.requestFocus();
+                    return;
+                }
+
+                if (!password.equals(confirmPassword)) {
+                    editTextConfirmPassword.setError("Passwords don't match");
+                    editTextConfirmPassword.requestFocus();
+                    return;
+                }
+
+                toggleGroup.setVisibility(View.GONE);
+                delAccButton.setVisibility(View.GONE);
+                loadingAnimation.setVisibility(View.VISIBLE);
+
+                AuthCredential userCredential = EmailAuthProvider.getCredential(email, password);
+                currentUser.reauthenticate(userCredential)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    currentUser.delete().addOnCompleteListener(new OnCompleteListener<Void>(){
+                                        public void onComplete(@NonNull Task<Void> firebaseUserDeleteTask) {
+                                            ArrayList<DocumentReference> userData = new ArrayList<DocumentReference>();
+                                            userData.add(db.collection("users").document(delUid));
+                                            userData.add(db.collection("userSongs").document(delUid));
+                                            userData.add(db.collection("userAlbums").document(delUid));
+                                            userData.add(db.collection("userArtists").document(delUid));
+                                            userData.add(db.collection("userPlaylists").document(delUid));
+
+                                            for (DocumentReference docRef : userData) {
+                                                try {
+                                                    docRef.delete();
+                                                    Log.d(TAG, "Document deleted successfully: " + docRef.getId());
+                                                } catch (Exception e) {
+                                                    Log.d(TAG, "Error deleting document: " + docRef.getId());
+                                                }
+                                            }
+
+                                            toggleGroup.setVisibility(View.VISIBLE);
+                                            delAccButton.setVisibility(View.VISIBLE);
+                                            loadingAnimation.setVisibility(View.GONE);
+
+                                            if (toast != null)
+                                                toast.cancel();
+                                            toast = Toast.makeText(getActivity(), "Deleted user account", Toast.LENGTH_SHORT);
+                                            toast.show();
+
+                                            FirebaseAuth.getInstance().signOut();
+                                            Intent intent = new Intent(requireActivity(), LoginActivity.class);
+                                            startActivity(intent);
+                                            requireActivity().finish();
+                                        }
+                                    });
+                                } else {
+                                    editTextPassword.setError("Wrong password");
+                                    editTextConfirmPassword.setError("Wrong password");
+                                    editTextPassword.requestFocus();
+                                    editTextConfirmPassword.requestFocus();
+                                    toggleGroup.setVisibility(View.VISIBLE);
+                                    delAccButton.setVisibility(View.VISIBLE);
+                                    loadingAnimation.setVisibility(View.GONE);
+                                }
+                            }
+                        });
             }
         });
 

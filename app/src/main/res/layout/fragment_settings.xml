@@ -63,6 +63,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginStart="30sp"
         android:hint="email"
+        android:focusable="false"
         android:singleLine="true"
         android:padding="10sp"
         android:textAlignment="center"
@@ -158,15 +159,14 @@
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/calculatorButton"
+        android:id="@+id/deleteAccountButton"
         android:layout_width="180sp"
         android:layout_height="60sp"
-        android:backgroundTint="@color/glass_teal"
-        android:text="Calculator"
-        android:visibility="gone"
+        android:backgroundTint="@color/glass_red"
+        android:text="Account"
         android:textColor="@color/black"
         android:textSize="15sp"
-        app:icon="@drawable/function_24px"
+        app:icon="@drawable/delete_24px"
         app:iconTint="@color/white"
         android:layout_marginTop="50sp"
         app:layout_constraintEnd_toEndOf="parent"
